@@ -82,13 +82,13 @@ Vector3.prototype.normalize = function() {
   return this.multiplyScalar( length ? 1 / length : 0 );
 };
 
-Vector3.prototype.applyProjection = function( m, near ) {
+Vector3.prototype.applyProjection = function( m, near, far ) {
   var x = this.x,
       y = this.y,
       z = this.z;
 
-  // Limit z to near plane.
-  z = z < near ? near : z;
+  // Limit z to near and far plane.
+  z = ( z < near ) ? near : ( ( z > far ) ? far : z );
 
   // Perspective divide.
   var d = 1 / ( m[ 3 ] * x + m[ 7 ] * y + m[ 11 ] * z + m[ 15 ] );
