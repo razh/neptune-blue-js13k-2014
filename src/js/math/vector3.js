@@ -100,4 +100,11 @@ Vector3.prototype.applyProjection = function( m, near, far ) {
   return this;
 };
 
+Vector3.prototype.setFromMatrixPosition = function( m ) {
+  this.x = m[ 12 ];
+  this.y = m[ 13 ];
+  this.z = m[ 14 ];
+  return this;
+};
+
 module.exports = Vector3;
