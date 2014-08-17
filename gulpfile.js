@@ -1,8 +1,8 @@
 // Based off of https://github.com/ooflorent/js13k-boilerplate.
 'use strict';
 
-var chalk = require( 'chalk' );
-var commander = require( 'commander' );
+var chalk = require('chalk');
+var commander = require('commander');
 
 var browserSync = require('browser-sync');
 var browserify = require('browserify');
