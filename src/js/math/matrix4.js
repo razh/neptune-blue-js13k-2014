@@ -78,6 +78,16 @@ Matrix4.prototype.identity = function() {
   return this;
 };
 
+Matrix4.prototype.setPosition = function( v ) {
+  var m = this.elements;
+
+  m[ 12 ] = v.x;
+  m[ 13 ] = v.y;
+  m[ 14 ] = v.z;
+
+  return this;
+};
+
 Matrix4.prototype.multiplyScalar = function ( s ) {
   var m = this.elements;
 
