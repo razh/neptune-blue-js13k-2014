@@ -15,6 +15,7 @@ var buffer = require('gulp-buffer');
 var htmlmin = require('gulp-htmlmin');
 var gulpif = require('gulp-if');
 var micro = require('gulp-micro');
+var replace = require('gulp-replace');
 var size = require('gulp-size');
 var uglify = require('gulp-uglify');
 var util = require('gulp-util');
