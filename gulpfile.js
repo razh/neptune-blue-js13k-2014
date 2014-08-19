@@ -81,7 +81,7 @@ gulp.task('watch', ['js', 'html', 'browser-sync'], function() {
 });
 
 gulp.task('build', ['clean', 'js', 'html'], function() {
-  return gulp.src('dist/*')
+  return gulp.src('dist/**/*')
     .pipe(zip('dist.zip'))
     .pipe(size())
     .pipe(micro({limit: 13 * 1024}))
