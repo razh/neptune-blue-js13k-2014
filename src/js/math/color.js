@@ -18,6 +18,27 @@ Color.prototype.toString = function() {
   ')';
 };
 
+Color.prototype.add = function( color ) {
+  this.r += color.r;
+  this.g += color.g;
+  this.b += color.b;
+  return this;
+};
+
+Color.prototype.multiply = function( color ) {
+  this.r *= color.r;
+  this.g *= color.g;
+  this.b *= color.b;
+  return this;
+};
+
+Color.prototype.multiplyScalar = function( s ) {
+  this.r *= s;
+  this.g *= s;
+  this.b *= s;
+  return this;
+};
+
 Color.prototype.lerp = function( color, alpha ) {
   this.r = lerp( this.r, color.r, alpha );
   this.g = lerp( this.g, color.g, alpha );
