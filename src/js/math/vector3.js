@@ -38,6 +38,20 @@ Vector3.prototype.multiplyScalar = function( scalar ) {
   return this;
 };
 
+Vector3.prototype.min = function( v ) {
+  if ( this.x > v.x ) { this.x = v.x; }
+  if ( this.y > v.y ) { this.y = v.y; }
+  if ( this.z > v.z ) { this.z = v.z; }
+  return this;
+};
+
+Vector3.prototype.max = function( v ) {
+  if ( this.x < v.x ) { this.x = v.x; }
+  if ( this.y < v.y ) { this.y = v.y; }
+  if ( this.z < v.z ) { this.z = v.z; }
+  return this;
+};
+
 Vector3.prototype.copy = function( v ) {
   this.x = v.x;
   this.y = v.y;
