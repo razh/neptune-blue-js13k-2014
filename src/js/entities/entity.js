@@ -9,7 +9,7 @@ function Entity( geometry, material ) {
   this.material = material;
 }
 
-Entity.prototype = Object.create( Object3D.prototype.constructor );
+Entity.prototype = Object.create( Object3D.prototype );
 Entity.prototype.constructor = Entity;
 
 module.exports = Entity;
