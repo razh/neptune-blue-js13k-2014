@@ -21,6 +21,8 @@ var uglify = require('gulp-uglify');
 var util = require('gulp-util');
 var zip = require('gulp-zip');
 
+var replaceAll = require('./replaceAll');
+
 commander.on('--help', function() {
   console.log('  Tasks:');
   console.log();
@@ -61,6 +63,7 @@ gulp.task('js', function() {
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(gulpif(production, uglify()))
+    .pipe(gulpif(production, replaceAll()))
     .pipe(gulp.dest('dist/js'));
 });
 

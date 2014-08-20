@@ -23,6 +23,7 @@
     "gulp-uglify": "^0.3.1",
     "gulp-util": "^3.0.0",
     "gulp-zip": "^1.0.0",
+    "through2": "^0.6.1",
     "vinyl-source-stream": "^0.1.1"
   }
 }
