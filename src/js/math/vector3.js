@@ -62,7 +62,7 @@ Vector3.prototype.negate = function() {
 Vector3.prototype.copy = function( v ) {
   this.x = v.x;
   this.y = v.y;
-  this.z = v.y;
+  this.z = v.z;
   return this;
 };
 
