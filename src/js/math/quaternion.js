@@ -38,4 +38,58 @@ Quaternion.prototype.multiplyQuaternions = function( a, b ) {
   return this;
 };
 
+Quaternion.prototype.setFromRotationMatrix = function ( m ) {
+  // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+  // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+
+  var e = m.elements,
+
+  m11 = e[ 0 ], m12 = e[ 4 ], m13 = e[  8 ],
+  m21 = e[ 1 ], m22 = e[ 5 ], m23 = e[  9 ],
+  m31 = e[ 2 ], m32 = e[ 6 ], m33 = e[ 10 ],
+
+  trace = m11 + m22 + m33,
+  s;
+
+  if ( trace > 0 ) {
+
+    s = 0.5 / Math.sqrt( trace + 1 );
+
+    this.w = 0.25 / s;
+    this.x = ( m32 - m23 ) * s;
+    this.y = ( m13 - m31 ) * s;
+    this.z = ( m21 - m12 ) * s;
+
+  } else if ( m11 > m22 && m11 > m33 ) {
+
+    s = 2 * Math.sqrt( 1 + m11 - m22 - m33 );
+
+    this.w = ( m32 - m23 ) / s;
+    this.x = 0.25 * s;
+    this.y = ( m12 + m21 ) / s;
+    this.z = ( m13 + m31 ) / s;
+
+  } else if ( m22 > m33 ) {
+
+    s = 2 * Math.sqrt( 1 + m22 - m11 - m33 );
+
+    this.w = ( m13 - m31 ) / s;
+    this.x = ( m12 + m21 ) / s;
+    this.y = 0.25 * s;
+    this.z = ( m23 + m32 ) / s;
+
+  } else {
+
+    s = 2 * Math.sqrt( 1 + m33 - m11 - m22 );
+
+    this.w = ( m21 - m12 ) / s;
+    this.x = ( m13 + m31 ) / s;
+    this.y = ( m23 + m32 ) / s;
+    this.z = 0.25 * s;
+
+  }
+
+  return this;
+};
+
 module.exports = Quaternion;
