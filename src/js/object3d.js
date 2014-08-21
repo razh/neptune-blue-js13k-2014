@@ -22,6 +22,7 @@ function Object3D() {
 Object3D.prototype.updateMatrix = function() {
   this.matrix.makeRotationFromQuaternion( this.quaternion );
   this.matrix.setPosition( this.position );
+  this.matrixWorld.copy( this.matrix );
   return this;
 };
 

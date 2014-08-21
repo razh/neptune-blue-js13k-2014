@@ -19,6 +19,8 @@ function Camera( fov, aspect, near, far ) {
 
   this.matrixWorldInverse = new Matrix4();
   this.projectionMatrix = new Matrix4();
+
+  this.updateProjectionMatrix();
 }
 
 Camera.prototype = Object.create( Object3D.prototype );
