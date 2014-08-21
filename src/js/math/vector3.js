@@ -52,6 +52,13 @@ Vector3.prototype.max = function( v ) {
   return this;
 };
 
+Vector3.prototype.negate = function() {
+  this.x = -this.x;
+  this.y = -this.y;
+  this.z = -this.z;
+  return this;
+};
+
 Vector3.prototype.copy = function( v ) {
   this.x = v.x;
   this.y = v.y;
@@ -71,7 +78,7 @@ Vector3.prototype.cross = function( v ) {
   return this;
 };
 
-Vector3.prototype.crossVectors =  function ( a, b ) {
+Vector3.prototype.crossVectors = function( a, b ) {
   var ax = a.x, ay = a.y, az = a.z;
   var bx = b.x, by = b.y, bz = b.z;
 
@@ -107,28 +114,56 @@ Vector3.prototype.normalize = function() {
   return this.multiplyScalar( length ? 1 / length : 0 );
 };
 
-Vector3.prototype.applyProjection = function( m, near, far ) {
+Vector3.prototype.applyMatrix3 = function( m ) {
   var x = this.x,
       y = this.y,
       z = this.z;
 
-  // Limit z to near and far plane.
-  z = ( z < near ) ? near : ( ( z > far ) ? far : z );
+  var e = m.elements;
 
+  this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
+  this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
+  this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
+
+  return this;
+};
+
+Vector3.prototype.applyMatrix4 = function( m ) {
+  // input: Matrix4 affine matrix
+  var x = this.x,
+      y = this.y,
+      z = this.z;
+
+  var e = m.elements;
+
+  this.x = e[ 0 ] * x + e[ 4 ] * y + e[  8 ] * z + e[ 12 ];
+  this.y = e[ 1 ] * x + e[ 5 ] * y + e[  9 ] * z + e[ 13 ];
+  this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+
+  return this;
+};
+
+Vector3.prototype.applyProjection = function( m ) {
+  var x = this.x,
+      y = this.y,
+      z = this.z;
+
+  var e = m.elements;
   // Perspective divide.
-  var d = 1 / ( m[ 3 ] * x + m[ 7 ] * y + m[ 11 ] * z + m[ 15 ] );
+  var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
 
-  this.x = ( m[ 0 ] * x + m[ 4 ] * y + m[  8 ] * z + m[ 12 ] ) * d;
-  this.y = ( m[ 1 ] * x + m[ 5 ] * y + m[  9 ] * z + m[ 13 ] ) * d;
-  this.z = ( m[ 2 ] * x + m[ 6 ] * y + m[ 10 ] * z + m[ 14 ] ) * d;
+  this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[  8 ] * z + e[ 12 ] ) * d;
+  this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[  9 ] * z + e[ 13 ] ) * d;
+  this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
 
   return this;
 };
 
 Vector3.prototype.setFromMatrixPosition = function( m ) {
-  this.x = m[ 12 ];
-  this.y = m[ 13 ];
-  this.z = m[ 14 ];
+  var e = m.elements;
+  this.x = e[ 12 ];
+  this.y = e[ 13 ];
+  this.z = e[ 14 ];
   return this;
 };
 
