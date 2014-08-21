@@ -1,9 +1,13 @@
 'use strict';
 
 var Object3D = require( './object3d' );
+var Vector3 = require( './math/vector3' );
 var Matrix4 = require( './math/matrix4' );
 
 var DEG_TO_RAD = Math.PI / 180;
+
+// Temp Matrix4.
+var mt = new Matrix4();
 
 function Camera( fov, aspect, near, far ) {
   Object3D.call( this );
@@ -19,6 +23,11 @@ function Camera( fov, aspect, near, far ) {
 
 Camera.prototype = Object.create( Object3D.prototype );
 Camera.prototype.constructor = Camera;
+
+Camera.prototype.lookAt = function( vector ) {
+  mt.lookAt( this.position, vector, Vector3.Y );
+  this.quaternion.setFromRotationMatrix( mt );
+};
 
 Camera.prototype.updateProjectionMatrix = function() {
   var near = this.near,

@@ -4,8 +4,11 @@ var Vector3 = require( './math/vector3' );
 var Matrix4 = require( './math/matrix4' );
 var Quaternion = require( './math/quaternion' );
 
-// Temp quaternion.
+// Temp Quaternion.
 var qt = new Quaternion();
+
+// Temp Matrix4.
+var mt = new Matrix4();
 
 function Object3D() {
   this.position = new Vector3();
@@ -40,6 +43,11 @@ Object3D.prototype.rotateY = function( angle ) {
 
 Object3D.prototype.rotateZ = function( angle ) {
   return this.rotateOnAxis( Vector3.Z, angle );
+};
+
+Object3D.prototype.lookAt = function( vector ) {
+  mt.lookAt( vector, this.position, Vector3.Y );
+  this.quaternion.setFromRotationMatrix( mt );
 };
 
 module.exports = Object3D;

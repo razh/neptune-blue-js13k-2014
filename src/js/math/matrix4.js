@@ -1,5 +1,7 @@
 'use strict';
 
+var Vector3 = require( './vector3' );
+
 function Matrix4(
   n11, n12, n13, n14,
   n21, n22, n23, n24,
@@ -221,5 +223,44 @@ Matrix4.prototype.makeRotationFromQuaternion = function( q ) {
 
   return this;
 };
+
+Matrix4.prototype.lookAt = (function() {
+  var x = new Vector3(),
+      y = new Vector3(),
+      z = new Vector3();
+
+  return function( eye, target, up ) {
+    var m = this.elements;
+
+    z.subVectors( eye, target ).normalize();
+
+    if ( !z.length() ) {
+      z.z = 1;
+    }
+
+    x.crossVectors( up, z ).normalize();
+
+    if ( !x.length() ) {
+      z.x += 0.0001;
+      x.crossVectors( up, z ).normalize();
+    }
+
+    y.crossVectors( z, x );
+
+    m[  0 ] = x.x;
+    m[  4 ] = y.x;
+    m[  8 ] = z.x;
+
+    m[  1 ] = x.y;
+    m[  5 ] = y.y;
+    m[  9 ] = z.y;
+
+    m[  2 ] = x.z;
+    m[  6 ] = y.z;
+    m[ 10 ] = z.z;
+
+    return this;
+  };
+}) ();
 
 module.exports = Matrix4;

@@ -71,6 +71,17 @@ Vector3.prototype.cross = function( v ) {
   return this;
 };
 
+Vector3.prototype.crossVectors =  function ( a, b ) {
+  var ax = a.x, ay = a.y, az = a.z;
+  var bx = b.x, by = b.y, bz = b.z;
+
+  this.x = ay * bz - az * by;
+  this.y = az * bx - ax * bz;
+  this.z = ax * by - ay * bx;
+
+  return this;
+};
+
 Vector3.prototype.dot = function( v ) {
   return this.x * v.x + this.y * v.y + this.z * v.z;
 };
