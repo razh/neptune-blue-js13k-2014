@@ -1,8 +1,10 @@
 'use strict';
 
+var Vector3 = require( './vector3' );
+
 function Box3( min, max ) {
-  this.min = min;
-  this.max = max;
+  this.min = min || new Vector3(  Infinity,  Infinity,  Infinity );
+  this.max = max || new Vector3( -Infinity, -Infinity, -Infinity );
 }
 
 Box3.prototype.contains = function( point ) {
