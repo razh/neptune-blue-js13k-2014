@@ -3,7 +3,6 @@
 
 var Color = require( './math/color' );
 var Camera = require( './camera' );
-var DirectionalLight = require( './lights/directional-light' );
 var Renderer = require( './renderer/renderer' );
 
 function Game( width, height ) {
@@ -23,12 +22,12 @@ function Game( width, height ) {
 
   this.entities = [];
 
-  this.light = new DirectionalLight();
+  this.lights = [];
   this.ambient = new Color();
 
   this.renderer = new Renderer({
     ctx: this.ctx,
-    light: this.light,
+    lights: this.lights,
     ambient: this.ambient
   });
 

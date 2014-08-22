@@ -39,7 +39,7 @@ function Renderer( options ) {
   _lightColor = new Color(),
 
   _ambientLight = options.ambient || new Color(),
-  _directionalLight = options.light,
+  _directionalLights = options.lights,
   _directionalIntensity = 0,
 
   _vector3 = new Vector3();
@@ -156,24 +156,32 @@ function Renderer( options ) {
     _ctx.restore();
   };
 
-  // Only calculates a single directional light.
   function calculateLight( normal, color ) {
-    var lightPosition = _vector3
-      .setFromMatrixPosition( _directionalLight.matrixWorld )
-      .normalize();
+    // Cumulative intensity of directional lights.
+    var intensity = 0;
+    var light;
+    for ( var l = 0, ll = _directionalLights.length; l < ll; l++ ) {
+      light = _directionalLights[l];
 
-    var amount = normal.dot( lightPosition );
-    if ( amount <= 0 ) {
-      return 0;
+      var lightPosition = _vector3
+        .setFromMatrixPosition( light.matrixWorld )
+        .normalize();
+
+      var amount = normal.dot( lightPosition );
+      if ( amount <= 0 ) {
+        continue;
+      }
+
+      amount *= light.intensity;
+      intensity += amount;
+
+      _lightColor.copy( light.color )
+        .multiplyScalar( amount );
+
+      color.add( _lightColor );
     }
 
-    amount *= _directionalLight.intensity;
-
-    _lightColor.copy( _directionalLight.color )
-      .multiplyScalar( amount );
-
-    color.add( _lightColor );
-    return amount;
+    return intensity;
   }
 
   function renderFace( element, material, isQuad, v0, v1, v2, v3 ) {
