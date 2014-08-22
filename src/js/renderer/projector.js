@@ -18,7 +18,7 @@ function Projector() {
   var _object, _objectCount, _objectPool = [],
   _vertex, _vertexCount = 0, _vertexPool = [],
   _face, _faceCount = 0, _facePool = [],
-  _quad, _quadCount = 0, _quadPool = [],
+  _quadCount = 0, _quadPool = [],
 
   _renderData = { objects: [], elements: [] },
 
@@ -92,70 +92,12 @@ function Projector() {
                ( v1.positionScreen.x - v0.positionScreen.x ) ) < 0;
     }
 
-    function pushTriangle( a, b, c ) {
-      var v0 = _vertexPool[ a ],
-          v1 = _vertexPool[ b ],
-          v2 = _vertexPool[ c ];
-
-      if ( !checkTriangleVisibility( v0, v1, v2 ) ) {
-        return;
-      }
-
-      if ( checkBackfaceCulling( v0, v1, v2 ) ) {
-        _face = getNextFaceInPool();
-        _face.v0.copy( v0 );
-        _face.v1.copy( v1 );
-        _face.v2.copy( v2 );
-        _face.z = (
-          v0.positionScreen.z +
-          v1.positionScreen.z +
-          v2.positionScreen.z
-        ) / 3;
-        _face.material = object.material;
-
-        _renderData.elements.push( _face );
-      }
-    }
-
-    /**
-     * Basically the same as pushTriangle. We assume that the quad is coplanar.
-     */
-    function pushQuad( a, b, c, d ) {
-      var v0 = _vertexPool[ a ],
-          v1 = _vertexPool[ b ],
-          v2 = _vertexPool[ c ],
-          v3 = _vertexPool[ d ];
-
-      if ( !checkTriangleVisibility( v0, v1, v2 ) ) {
-        return;
-      }
-
-      if ( checkBackfaceCulling( v0, v1, v2 ) ) {
-        _quad = getNextQuadInPool();
-        _quad.v0.copy( v0 );
-        _quad.v1.copy( v1 );
-        _quad.v2.copy( v2 );
-        _quad.v3.copy( v3 );
-        _quad.z = (
-          v0.positionScreen.z +
-          v1.positionScreen.z +
-          v2.positionScreen.z +
-          v3.positionScreen.z
-        ) / 4;
-        _quad.material = object.material;
-
-        _renderData.elements.push( _quad );
-      }
-    }
-
     return {
       setObject: setObject,
       projectVertex: projectVertex,
+      pushVertex: pushVertex,
       checkTriangleVisibility: checkTriangleVisibility,
       checkBackfaceCulling: checkBackfaceCulling,
-      pushVertex: pushVertex,
-      pushTriangle: pushTriangle,
-      pushQuad: pushQuad
     };
   }
 
