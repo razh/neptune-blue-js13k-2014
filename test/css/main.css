@@ -1,0 +1,23 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -webkit-flex;
+  display: flex;
+
+  -webkit-align-items: center;
+  align-items: center;
+
+  -webkit-justify-content: center;
+  justify-content: center;
+
+  margin: 0;
+  background-color: #000;
+  overflow: hidden;
+}
+
+canvas {
+  outline: 1px solid #222;
+}

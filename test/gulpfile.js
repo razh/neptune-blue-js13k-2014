@@ -29,14 +29,19 @@ gulp.task('js', function() {
     .pipe(gulp.dest('dist/js'));
 });
 
+gulp.task('css', function() {
+  return gulp.src(['./**/*.css', '!./dist/**/*.css'])
+    .pipe(gulp.dest('dist'));
+});
+
 gulp.task('html', function() {
-  return gulp.src('./**/*.html')
+  return gulp.src(['./**/*.html', '!./dist/**/*.html'])
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('clean', del.bind(null, ['dist']));
 
-gulp.task('default', ['js', 'html', 'browser-sync'], function() {
+gulp.task('default', ['js', 'css' ,'html', 'browser-sync'], function() {
   gulp.watch([
     './**/*.js', '!./dist/**/*.js', '!./gulpfile.js'
   ], ['js', browserSync.reload]);
