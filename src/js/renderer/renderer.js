@@ -77,6 +77,8 @@ function Renderer( options ) {
     _canvasHeightHalf = _canvasHeight / 2;
 
     _ctx.save();
+
+    _ctx.setTransform( 1, 0, 0, -1, 0, _canvasHeight );
     _ctx.translate( _canvasWidthHalf, _canvasHeightHalf );
 
     _renderData = _projector.projectScene( scene, camera );
