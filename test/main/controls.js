@@ -142,11 +142,8 @@ function Controls( object ) {
     theta += thetaDelta;
     phi += phiDelta;
 
-    // restrict phi to be between desired limits
-    phi = Utils.clamp( phi, 0, Math.PI );
-
     // restrict phi to be betwee EPS and PI-EPS
-    phi = Utils.clamp( phi, 0, Math.PI - EPSILON );
+    phi = Utils.clamp( phi, EPSILON, Math.PI - EPSILON );
 
     var radius = offset.length() * scale;
 
@@ -199,7 +196,7 @@ function Controls( object ) {
     rotateX( 2 * Math.PI * dx / window.innerWidth  * rotateSpeed );
 
     // rotating up and down along whole screen attempts to go 360, but limited to 180
-    rotateY( -2 * Math.PI * dy / window.innerHeight * rotateSpeed );
+    rotateY( 2 * Math.PI * dy / window.innerHeight * rotateSpeed );
 
     this.update();
   }.bind( this );
