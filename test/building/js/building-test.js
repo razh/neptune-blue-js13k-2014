@@ -30,16 +30,16 @@ window.BuildingTest = function() {
 
     geometry.vertices = [
       // Counterclockwise from far left.
-      // Top.
-      new Vector3( -halfWidth, -height, -halfDepth ),
-      new Vector3( -halfWidth, -height,  halfDepth ),
-      new Vector3(  halfWidth, -height,  halfDepth ),
-      new Vector3(  halfWidth, -height, -halfDepth ),
       // Bottom.
       new Vector3( -halfWidth, 0, -halfDepth ),
       new Vector3( -halfWidth, 0,  halfDepth ),
       new Vector3(  halfWidth, 0,  halfDepth ),
-      new Vector3(  halfWidth, 0, -halfDepth )
+      new Vector3(  halfWidth, 0, -halfDepth ),
+      // Top.
+      new Vector3( -halfWidth, height, -halfDepth ),
+      new Vector3( -halfWidth, height,  halfDepth ),
+      new Vector3(  halfWidth, height,  halfDepth ),
+      new Vector3(  halfWidth, height, -halfDepth )
     ];
 
     geometry.faces = [
@@ -50,7 +50,7 @@ window.BuildingTest = function() {
       new Quad( 3, 0, 4, 7 ),
 
       // Top.
-      new Quad( 0, 3, 2, 1 ),
+      new Quad( 4, 5, 6, 7 ),
     ];
 
     geometry.computeFaceNormals();
@@ -75,13 +75,13 @@ window.BuildingTest = function() {
   game.lights.push( light );
 
   var light2 = new DirectionalLight( new Color( 0.8, 0.8, 0.8 ) );
-  light2.position.set( 0, -10, 0 );
+  light2.position.set( 0, 10, 0 );
   light2.updateMatrix();
   game.lights.push( light2 );
 
   game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
-  game.camera.position.set( 0, 0, -4 );
+  game.camera.position.set( -2, 5, -4 );
   game.camera.lookAt( entity.position );
   game.camera.updateProjectionMatrix();
 

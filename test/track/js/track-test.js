@@ -21,22 +21,22 @@ function createTrackGeometry( radius, length, panelSpacing ) {
 
   geometry.vertices = [
     // Left panel.
-    new Vector3( radius + panelSpacing, -height, -length ),
-    new Vector3( radius + panelSpacing, -height, 0 ),
     new Vector3( radius / 2 + panelSpacing, 0, 0 ),
+    new Vector3( radius + panelSpacing, height, 0 ),
+    new Vector3( radius + panelSpacing, height, -length ),
     new Vector3( radius / 2 + panelSpacing, 0, -length ),
 
     // Center panel.
-    new Vector3(  ( radius / 2 ), 0, -length ),
-    new Vector3(  ( radius / 2 ), 0, 0 ),
     new Vector3( -( radius / 2 ), 0, 0 ),
+    new Vector3(  ( radius / 2 ), 0, 0 ),
+    new Vector3(  ( radius / 2 ), 0, -length ),
     new Vector3( -( radius / 2 ), 0, -length ),
 
     // Right panel.
-    new Vector3( -( radius + panelSpacing ), -height, 0 ),
-    new Vector3( -( radius + panelSpacing ), -height, -length ),
+    new Vector3( -( radius + panelSpacing ), height, 0 ),
+    new Vector3( -( radius / 2 + panelSpacing ), 0, 0 ),
     new Vector3( -( radius / 2 + panelSpacing ), 0, -length ),
-    new Vector3( -( radius / 2 + panelSpacing ), 0, 0 )
+    new Vector3( -( radius + panelSpacing ), height, -length )
   ];
 
   geometry.faces = [
@@ -121,11 +121,15 @@ window.TrackTest = function() {
     count: 5
   }));
 
-  game.camera.position.set( 0, 0, -4 );
-  game.camera.lookAt( game.entities[0].position );
-  game.camera.updateProjectionMatrix();
+  game.camera.position.set( 0, 2, -4 );
 
+  var lastEntity = game.entities[ game.entities.length - 1 ];
   var controls = new Controls( game.camera );
+  var target = new Vector3().copy( lastEntity.position );
+  target.y = 2;
+  controls.target = target;
+  game.camera.lookAt( target );
+  game.camera.updateProjectionMatrix();
 
   game.play();
 };
