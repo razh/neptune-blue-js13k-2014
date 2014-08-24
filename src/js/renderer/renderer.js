@@ -48,6 +48,10 @@ function Renderer( options ) {
     return;
   }
 
+  // Set default line attributes to avoid miters.
+  _ctx.lineCap = 'round';
+  _ctx.lineJoin = 'round';
+
   this.info = {
     render: {
       vertices: 0,
