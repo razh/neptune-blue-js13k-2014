@@ -29,7 +29,7 @@ function Projector() {
     new Vector3(  1,  1,  1 )
   ),
   _boundingBox = new Box3(),
-  _points3 = new Array( 3 ),
+  _points = [],
 
   _viewMatrix = new Matrix4(),
   _viewProjectionMatrix = new Matrix4(),
@@ -71,17 +71,21 @@ function Projector() {
       projectVertex( _vertex );
     }
 
-    function checkTriangleVisibility( v0, v1, v2 ) {
-      if ( v0.visible || v1.visible || v2.visible ) {
+    function checkTriangleVisibility( v0, v1, v2, v3 ) {
+      if ( v0.visible || v1.visible || v2.visible || ( v3 && v3.visible ) ) {
         return true;
       }
 
-      _points3[ 0 ] = v0.positionScreen;
-      _points3[ 1 ] = v1.positionScreen;
-      _points3[ 2 ] = v2.positionScreen;
+      _points.length = 0;
+      _points[ 0 ] = v0.positionScreen;
+      _points[ 1 ] = v1.positionScreen;
+      _points[ 2 ] = v2.positionScreen;
+      if ( v3 ) {
+        _points[ 3 ] = v3.positionScreen;
+      }
 
       return _clipBox.isIntersectionBox(
-        _boundingBox.setFromPoints( _points3 )
+        _boundingBox.setFromPoints( _points )
       );
     }
 
@@ -182,7 +186,8 @@ function Projector() {
           v3 = _vertexPool[ face.d ];
         }
 
-        if ( !renderList.checkTriangleVisibility( v0, v1, v2 ) ) {
+        if ( !isQuad && !renderList.checkTriangleVisibility( v0, v1, v2 ) ||
+              isQuad && !renderList.checkTriangleVisibility( v0, v1, v2, v3 ) ) {
           continue;
         }
 
