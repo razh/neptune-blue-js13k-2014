@@ -1,3 +1,3 @@
 'use strict';
 
-require( './building/js/main' );
+require( './building/js/building-test' );
