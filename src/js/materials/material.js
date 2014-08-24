@@ -13,11 +13,13 @@ function Material( options ) {
   this.side = options.side || FrontSide;
 
   this.color = options.color || new Color();
+  this.strokeColor = options.strokeColor;
+
   this.opacity = ( options.opacity !== undefined ) ? options.opacity : 1;
   this.lineWidth = options.lineWidth || 0;
 
   this.fillVisible = ( options.fillVisible !== undefined ) ? options.fillVisible : true;
-  this.wireframe = ( options.wireframe !== undefined ) ? options.wireframe : true;
+  this.wireframe = ( options.wireframe !== undefined ) ? options.wireframe : false;
 
   this.shadowColor = options.shadowColor || new Color();
   this.shadowBlur = options.shadowBlur || 0;
@@ -27,9 +29,11 @@ function Material( options ) {
 
 Material.prototype.set = function( ctx ) {
   var color = this.color.toString();
+  var strokeColor = ( this.strokeColor && this.color !== this.strokeColor ) ?
+    this.strokeColor.toString() : color;
 
   ctx.fillStyle = color;
-  ctx.strokeStyle = color;
+  ctx.strokeStyle = strokeColor;
 
   ctx.globalAlpha = this.opacity;
   ctx.lineWidth = this.lineWidth;

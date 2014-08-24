@@ -17,11 +17,7 @@ LambertMaterial.prototype = Object.create( Material.prototype );
 LambertMaterial.prototype.constructor = LambertMaterial;
 
 LambertMaterial.prototype.draw = function( ctx, color ) {
-  color = color.toString();
-
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-
+  ctx.fillStyle = color.toString();
   Material.prototype.draw.call( this, ctx );
 };
 
