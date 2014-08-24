@@ -116,6 +116,8 @@ function Controls( object ) {
 
   var phiDelta = 0;
   var thetaDelta = 0;
+  var scale = 1;
+  var dollyRate = 0.98;
 
   var EPSILON = 1e-6;
 
@@ -146,7 +148,7 @@ function Controls( object ) {
     // restrict phi to be betwee EPS and PI-EPS
     phi = Utils.clamp( phi, 0, Math.PI - EPSILON );
 
-    var radius = offset.length();
+    var radius = offset.length() * scale;
 
     offset.x = radius * Math.sin( phi ) * Math.sin( theta );
     offset.y = radius * Math.cos( phi );
@@ -161,6 +163,7 @@ function Controls( object ) {
 
     thetaDelta = 0;
     phiDelta = 0;
+    scale = 1;
   };
 
   function rotateX( angle ) {
@@ -205,9 +208,27 @@ function Controls( object ) {
     mouse.down = false;
   }.bind( this );
 
+  this.onScroll = function( event ) {
+    var deltaY = event.deltaY;
+    if ( !deltaY ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if ( deltaY > 0 ) {
+      scale /= dollyRate;
+    } else {
+      scale *= dollyRate;
+    }
+
+    this.update();
+  }.bind( this );
+
   document.addEventListener( 'mousedown', this.onMouseDown );
   document.addEventListener( 'mousemove', this.onMouseMove );
   document.addEventListener( 'mouseup', this.onMouseUp );
+  window.addEventListener( 'wheel', this.onScroll );
 
   this.update();
 }
