@@ -42,11 +42,13 @@ geometry.computeFaceNormals();
 var material = new LambertGlowMaterial({
   // side: Material.DoubleSide,
   color: new Color( 0.5, 0.5, 0.5 ),
+  strokeColor: new Color( 1, 0.5, 0.5 ),
   ambient: new Color( 0.5, 0.5, 0.5 ),
   diffuse: new Color( 0.5, 0.5, 0.5 ),
   emissive: new Color( 0, 0, 0 ),
   // fillVisible: false,
   wireframe: true,
+  lineWidth: 10,
   opacity: 1,
   shadowColor: new Color( 1, 0, 0 ),
   blur: 32
