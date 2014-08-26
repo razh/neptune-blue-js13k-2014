@@ -13,14 +13,17 @@ var mt = new Matrix4();
 function Object3D() {
   this.position = new Vector3();
   this.quaternion = new Quaternion();
-  this.visible = true;
+  this.scale = new Vector3( 1, 1, 1 );
 
   this.matrix = new Matrix4();
   this.matrixWorld = new Matrix4();
+
+  this.visible = true;
 }
 
 Object3D.prototype.updateMatrix = function() {
   this.matrix.makeRotationFromQuaternion( this.quaternion );
+  this.matrix.scale( this.scale );
   this.matrix.setPosition( this.position );
   this.matrixWorld.copy( this.matrix );
   return this;

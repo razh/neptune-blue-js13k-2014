@@ -263,4 +263,29 @@ Matrix4.prototype.lookAt = (function() {
   };
 }) ();
 
+Matrix4.prototype.scale = function( v ) {
+  var m = this.elements;
+
+  var x = v.x,
+      y = v.y,
+      z = v.z;
+
+  m[  0 ] *= x;
+  m[  1 ] *= x;
+  m[  2 ] *= x;
+  m[  3 ] *= x;
+
+  m[  4 ] *= y;
+  m[  5 ] *= y;
+  m[  6 ] *= y;
+  m[  7 ] *= y;
+
+  m[  8 ] *= z;
+  m[  9 ] *= z;
+  m[ 10 ] *= z;
+  m[ 11 ] *= z;
+
+  return this;
+};
+
 module.exports = Matrix4;
