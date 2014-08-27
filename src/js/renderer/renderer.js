@@ -162,7 +162,8 @@ function Renderer( options ) {
     _ctx.restore();
   };
 
-  function calculateLight( normal, color ) {
+  function calculateLight( element, material, color ) {
+    var normal = element.normalModel;
     // Cumulative intensity of directional lights.
     var intensity = 0;
     var light;
@@ -179,7 +180,9 @@ function Renderer( options ) {
       }
 
       amount *= light.intensity;
-      intensity += amount;
+      if ( !material.filter || material.filter.collides( light.filter ) ) {
+        intensity += amount;
+      }
 
       _lightColor.copy( light.color )
         .multiplyScalar( amount );
@@ -216,7 +219,7 @@ function Renderer( options ) {
       _emissiveColor.copy( material.emissive );
       _color.copy( _ambientLight );
 
-      _directionalIntensity = calculateLight( element.normalModel, _color );
+      _directionalIntensity = calculateLight( element, material, _color );
 
       _color.multiply( _diffuseColor ).add( _emissiveColor );
       material.draw( _ctx, _color, _directionalIntensity );
