@@ -42,12 +42,12 @@ function addFuselageGeometry( geometry, forward, aft, width, height ) {
 
   var offset = geometry.vertices.length;
   var i, il;
-  for ( i = 0, il = vertices.length / 3; i < il; i++ ) {
+  for ( i = 0, il = vertices.length; i < il; i += 3 ) {
     geometry.vertices.push(
       new Vector3(
-        vertices[ 3 * i     ],
-        vertices[ 3 * i + 1 ],
-        vertices[ 3 * i + 2 ]
+        vertices[ i     ],
+        vertices[ i + 1 ],
+        vertices[ i + 2 ]
       )
     );
   }
@@ -74,12 +74,12 @@ function addFuselageGeometry( geometry, forward, aft, width, height ) {
     1, 5, 3
   ];
 
-  for ( i = 0, il = indices.length / 3; i < il; i++ ) {
+  for ( i = 0, il = indices.length; i < il; i += 3 ) {
     geometry.faces.push(
       new Face3(
-        offset + indices[ 3 * i     ],
-        offset + indices[ 3 * i + 1 ],
-        offset + indices[ 3 * i + 2 ]
+        offset + indices[ i     ],
+        offset + indices[ i + 1 ],
+        offset + indices[ i + 2 ]
       )
     );
   }
@@ -116,22 +116,22 @@ function addWingGeometry( geometry, offsetX, width, height, length, shear, forwa
 
   var offset = geometry.vertices.length;
   var i, il;
-  for ( i = 0, il = vertices.length / 3; i < il; i++ ) {
+  for ( i = 0, il = vertices.length; i < il; i += 3 ) {
     geometry.vertices.push(
       new Vector3(
-        scaleX * ( vertices[ 3 * i ] + offsetX ),
-        scaleX * vertices[ 3 * i + 1 ],
-        vertices[ 3 * i + 2 ]
+        scaleX * ( vertices[ i ] + offsetX ),
+        scaleX * vertices[ i + 1 ],
+        vertices[ i + 2 ]
       )
     );
   }
 
-  for ( i = 0, il = indices.length / 3; i < il; i++ ) {
+  for ( i = 0, il = indices.length; i < il; i += 3 ) {
     geometry.faces.push(
       new Face3(
-        offset + indices[ 3 * i     ],
-        offset + indices[ 3 * i + 1 ],
-        offset + indices[ 3 * i + 2 ]
+        offset + indices[ i     ],
+        offset + indices[ i + 1 ],
+        offset + indices[ i + 2 ]
       )
     );
   }
@@ -219,7 +219,7 @@ window.ShipTest = function() {
   var entity = new Entity( shipGeometry, material );
   game.entities.push( entity );
 
-  game.ambient.setRGB( 0.5, 0.5, 0.5 );
+  game.ambient.setRGB( 0.4, 0.4, 0.4 );
 
   game.camera.position.set( 0, 1.8, -5 );
   game.camera.lookAt( 0, 0, 0 );
