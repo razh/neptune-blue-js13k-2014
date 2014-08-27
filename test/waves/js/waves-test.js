@@ -70,15 +70,15 @@ window.WavesTest = function() {
 
   var planeGeometry = createPlaneGeometry( 32, 16, 16, 8 );
   var material = new LambertMaterial({
-    color: new Color( 0.8, 0.6, 0.6 ),
-    strokeColor: new Color( 1, 0.9, 0.9 ),
+    color: new Color( 0.5, 0.5, 0.5 ),
+    strokeColor: new Color( 0.9, 0.9, 1 ),
     diffuse: new Color( 0.9, 0.9, 0.9 ),
     ambient: new Color( 0.3, 0.3, 0.3 ),
     wireframe: true,
-    lineWidth: 2,
+    lineWidth: 1,
     shadowColor: new Color( 0.5, 0.5, 1 ),
     blur: 50,
-    opacity: 0.8
+    opacity: 0.5
   });
 
   var entity = new Entity( planeGeometry, material );
@@ -90,12 +90,30 @@ window.WavesTest = function() {
   game.camera.lookAt( 0, 0, 0 );
   game.camera.updateProjectionMatrix();
   var controls = new Controls( game.camera );
+  controls.target.set( 0, 3, 8 );
+  controls.update();
 
-  var light = new DirectionalLight( new Color( 1, 0.5, 0.3 ) );
+  var light = new DirectionalLight( new Color( 0.6, 0.6, 0.8 ) );
   light.intensity = 2;
   light.position.set( -4, 2, 0 );
   light.updateMatrix();
   game.lights.push( light );
+
+  var time = 0;
+  var offset = 0;
+  entity.update = function( dt ) {
+    time += dt;
+    var vertices = planeGeometry.vertices;
+    var x, z;
+    for ( var i = 0, il = vertices.length; i < il; i++ ) {
+      x = i % il;
+      z = Math.floor( i / il );
+      offset = x + z;
+      vertices[i].y = 0.6 * Math.sin( 10 * time + offset );
+    }
+
+    planeGeometry.computeFaceNormals();
+  };
 
   game.play();
 };

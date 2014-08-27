@@ -140,8 +140,8 @@ function addWingGeometry( geometry, offsetX, width, height, length, shear, forwa
 function createShipGeometry() {
   var geometry = new Geometry();
 
-  var fuselageForward = 5;
-  var fuselageAft = 1.5;
+  var fuselageForward = 4;
+  var fuselageAft = 1;
   var fuselageWidth = 0.8;
   var fuselageHeight = 0.8;
 
@@ -153,7 +153,7 @@ function createShipGeometry() {
   );
 
   var wingOffsetX = 0.7;
-  var wingWidth = 1;
+  var wingWidth = 0.8;
   var wingHeight = 0.2;
   var wingLength = 1.2;
   var wingShear = Math.PI / 4;
@@ -186,18 +186,21 @@ function createShipGeometry() {
   return geometry;
 }
 
-var spaceKey = false;
+var movement = false;
 document.addEventListener( 'keydown', function( event ) {
   if ( event.which === 32 ) {
-    spaceKey = true;
+    movement = true;
   }
 });
 
 document.addEventListener( 'keyup', function( event ) {
   if ( event.which === 32 ) {
-    spaceKey = false;
+    movement = false;
   }
 });
+
+document.addEventListener( 'touchstart', function() { movement = true;  });
+document.addEventListener( 'touchend',   function() { movement = false; });
 
 window.ShipTest = function() {
   var game = new Game( 568, 320 );
@@ -233,7 +236,7 @@ window.ShipTest = function() {
   var prev = 0;
   var rotateZ = 0;
   entity.update = function( dt ) {
-    if ( !spaceKey ) {
+    if ( !movement ) {
       return;
     }
 
