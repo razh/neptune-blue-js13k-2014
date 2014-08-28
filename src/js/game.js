@@ -20,7 +20,7 @@ function Game( width, height ) {
   this.camera = new Camera( this.fov );
   this.setSize( width, height );
 
-  this.entities = [];
+  this.scene = [];
 
   this.lights = [];
   this.ambient = new Color();
@@ -55,13 +55,13 @@ Game.prototype.update = function() {
 
   dt *= 1e-3;
 
-  this.entities.forEach(function( entity ) {
+  this.scene.forEach(function( entity ) {
     entity.update( dt );
   });
 };
 
 Game.prototype.draw = function() {
-  this.renderer.render( this.entities, this.camera );
+  this.renderer.render( this.scene, this.camera );
 };
 
 Game.prototype.play = function() {

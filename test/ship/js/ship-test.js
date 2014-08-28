@@ -217,7 +217,7 @@ window.ShipTest = function() {
   });
 
   var entity = new Entity( shipGeometry, material );
-  game.entities.push( entity );
+  game.scene.push( entity );
 
   game.ambient.setRGB( 0.4, 0.4, 0.4 );
 

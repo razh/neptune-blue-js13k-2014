@@ -82,7 +82,7 @@ window.WavesTest = function() {
   });
 
   var entity = new Entity( planeGeometry, material );
-  game.entities.push( entity );
+  game.scene.push( entity );
 
   game.ambient.setRGB( 0.5, 0.5, 0.5 );
 
@@ -98,6 +98,8 @@ window.WavesTest = function() {
   light.position.set( -4, 2, 0 );
   light.updateMatrix();
   game.lights.push( light );
+
+  game.scene.fogDensity = 0.1;
 
   var time = 0;
   var offset = 0;

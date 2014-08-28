@@ -117,13 +117,13 @@ window.TrackTest = function() {
   var game = new Game( 568, 320 );
   document.body.appendChild( game.canvas );
 
-  game.entities = game.entities.concat(createTrackEntities({
+  game.scene = game.scene.concat(createTrackEntities({
     count: 5
   }));
 
   game.camera.position.set( 0, 2, -4 );
 
-  var lastEntity = game.entities[ game.entities.length - 1 ];
+  var lastEntity = game.scene[ game.scene.length - 1 ];
   var controls = new Controls( game.camera );
   var target = new Vector3().copy( lastEntity.position );
   target.y = 2;

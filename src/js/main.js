@@ -19,7 +19,7 @@ var game = new Game(
 
 document.body.appendChild( game.canvas );
 
-var entities = game.entities;
+var scene = game.scene;
 
 var geometry = new Geometry();
 
@@ -55,7 +55,7 @@ var material = new LambertGlowMaterial({
 });
 
 var entity = new Entity( geometry, material );
-entities.push( entity );
+scene.push( entity );
 
 game.ambient.setRGB( 0.2, 0.2, 0.2 );
 

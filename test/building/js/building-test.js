@@ -18,7 +18,7 @@ window.BuildingTest = function() {
   var game = new Game( 568, 320 );
   document.body.appendChild( game.canvas );
 
-  var entities = game.entities;
+  var scene = game.scene;
 
   // Generate building geometry.
   // Origin is at the center of the bottom face.
@@ -98,7 +98,7 @@ window.BuildingTest = function() {
   });
 
   var entity = new Entity( boxGeometry, material );
-  entities.push( entity );
+  scene.push( entity );
 
   var light = new DirectionalLight( new Color( 0.5, 0.5, 0.5 ) );
   light.position.set( -10, 0, 5 );
