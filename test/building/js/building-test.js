@@ -102,14 +102,12 @@ window.BuildingTest = function() {
 
   var light = new DirectionalLight( new Color( 0.5, 0.5, 0.5 ) );
   light.position.set( -10, 0, 5 );
-  light.updateMatrix();
   light.filter.maskBits = 0;
-  game.lights.push( light );
+  game.scene.push( light );
 
   var light2 = new DirectionalLight( new Color( 1, 1, 1 ) );
   light2.position.set( 0, 10, 0 );
-  light2.updateMatrix();
-  game.lights.push( light2 );
+  game.scene.push( light2 );
 
   game.ambient.setRGB( 0.2, 0.2, 0.2 );
 

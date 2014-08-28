@@ -61,18 +61,15 @@ game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
 var light = new DirectionalLight( new Color( 1, 0, 0 ) );
 light.position.set( -10, 0, 0 );
-light.updateMatrix();
-game.lights.push( light );
+game.scene.push( light );
 
 var light2 = new DirectionalLight( new Color( 0, 0.4, 0 ) );
 light2.position.set( 0, 10, 0 );
-light2.updateMatrix();
-game.lights.push( light2 );
+game.scene.push( light2 );
 
 var light3 = new DirectionalLight( new Color( 0, 0, 0.4 ) );
 light3.position.set( 0, -10, 0 );
-light3.updateMatrix();
-game.lights.push( light3 );
+game.scene.push( light3 );
 
 game.ambient.setRGB( 0.5, 0.5, 0.5 );
 

@@ -96,8 +96,7 @@ window.WavesTest = function() {
   var light = new DirectionalLight( new Color( 0.6, 0.6, 0.8 ) );
   light.intensity = 2;
   light.position.set( -4, 2, 0 );
-  light.updateMatrix();
-  game.lights.push( light );
+  game.scene.push( light );
 
   game.scene.fogDensity = 0.1;
 

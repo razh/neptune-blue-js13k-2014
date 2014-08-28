@@ -229,8 +229,7 @@ window.ShipTest = function() {
 
   var light = new DirectionalLight( new Color( 1, 1, 1 ) );
   light.position.set( -5, 10, 0 );
-  light.updateMatrix();
-  game.lights.push( light );
+  game.scene.push( light );
 
   var time = 0;
   var prev = 0;
