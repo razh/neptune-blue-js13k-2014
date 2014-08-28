@@ -109,6 +109,10 @@ Vector3.prototype.distanceToSquared = function( v ) {
   return dx * dx + dy * dy + dz * dz;
 };
 
+Vector3.prototype.distanceTo = function( v ) {
+  return Math.sqrt( this.distanceToSquared( v ) );
+};
+
 Vector3.prototype.normalize = function() {
   var length = this.length();
   return this.multiplyScalar( length ? 1 / length : 0 );

@@ -9,13 +9,14 @@ var RenderableQuad = require( './renderable-quad' );
 
 var Projector = require( './projector' );
 
+var PointLight = require( '../lights/point-light' );
 var LambertMaterial = require( '../materials/lambert-material' );
 
 function Renderer( options ) {
   options = options || {};
 
   var _this = this,
-  _renderData, _elements,
+  _renderData, _elements, _lights,
   _projector = new Projector(),
 
   _ctx = options.ctx,
@@ -40,19 +41,18 @@ function Renderer( options ) {
   _lightColor = new Color(),
 
   _ambientLight = options.ambient || new Color(),
-  _directionalLights = options.lights,
-  _directionalIntensity = 0,
+  _intensity = 0,
   _fogDensity,
 
-  _vector3 = new Vector3();
+  _vector3 = new Vector3(),
+  _centroid = new Vector3();
 
   if ( !_ctx ) {
     return;
   }
 
   // Set default line attributes to avoid miters.
-  _ctx.lineCap = 'round';
-  _ctx.lineJoin = 'round';
+  _ctx.lineCap = _ctx.lineJoin = 'round';
 
   this.info = {
     render: {
@@ -62,13 +62,11 @@ function Renderer( options ) {
     }
   };
 
-  this.clear = function() {
-    _ctx.clearRect( 0, 0, _ctx.canvas.width, _ctx.canvas.height );
+  this.clear = function( width, height ) {
+    _ctx.clearRect( 0, 0, width, height );
   };
 
   this.render = function( scene, camera ) {
-    this.clear();
-
     _this.info.render.vertices = 0;
     _this.info.render.faces = 0;
     _this.info.render.quads = 0;
@@ -78,6 +76,8 @@ function Renderer( options ) {
     _canvasWidthHalf = _canvasWidth / 2;
     _canvasHeightHalf = _canvasHeight / 2;
 
+    this.clear( _canvasWidth, _canvasHeight );
+
     _ctx.save();
 
     _ctx.setTransform( 1, 0, 0, -1, 0, _canvasHeight );
@@ -85,6 +85,7 @@ function Renderer( options ) {
 
     _renderData = _projector.projectScene( scene, camera );
     _elements = _renderData.elements;
+    _lights = _renderData.lights;
     _camera = camera;
 
     _fogDensity = scene.fogDensity;
@@ -166,32 +167,47 @@ function Renderer( options ) {
     _ctx.restore();
   };
 
-  function calculateLight( element, material, color ) {
+  function calculateLight( element, position, material, color ) {
     var normal = element.normalModel;
-    // Cumulative intensity of directional lights.
+    // Cumulative blur intensity of directional lights.
     var intensity = 0;
-    var light;
-    for ( var l = 0, ll = _directionalLights.length; l < ll; l++ ) {
-      light = _directionalLights[l];
+    var light, lightPosition, isPointLight;
+    var amount;
+    for ( var l = 0, ll = _lights.length; l < ll; l++ ) {
+      light = _lights[l];
+      _lightColor.copy( light.color );
 
-      var lightPosition = _vector3
-        .setFromMatrixPosition( light.matrixWorld )
-        .normalize();
+      lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
-      var amount = normal.dot( lightPosition );
+      isPointLight = light instanceof PointLight;
+      if ( isPointLight ) {
+        amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+      } else {
+        amount = normal.dot( lightPosition.normalize() );
+      }
+
       if ( amount <= 0 ) {
         continue;
       }
 
+      if ( isPointLight ) {
+        amount *= light.distance ?
+          1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 )
+          : 1;
+
+        if ( !amount ) {
+          continue;
+        }
+      }
+
       amount *= light.intensity;
+
+      // Blur filter.
       if ( !material.filter || material.filter.collides( light.filter ) ) {
         intensity += amount;
       }
 
-      _lightColor.copy( light.color )
-        .multiplyScalar( amount );
-
-      color.add( _lightColor );
+      color.add( _lightColor.multiplyScalar( amount ) );
     }
 
     return intensity;
@@ -238,10 +254,20 @@ function Renderer( options ) {
         _emissiveColor.copy( material.emissive );
         _color.copy( _ambientLight );
 
-        _directionalIntensity = calculateLight( element, material, _color );
+        _centroid.copy( v0.positionWorld )
+          .add( v1.positionWorld )
+          .add( v2.positionWorld );
+
+        if ( isQuad ) {
+          _centroid.add( v3.positionWorld ).multiplyScalar( 1 / 4 );
+        } else {
+          _centroid.multiplyScalar( 1 / 3 );
+        }
+
+        _intensity = calculateLight( element, _centroid, material, _color );
 
         _color.multiply( _diffuseColor ).add( _emissiveColor );
-        material.draw( _ctx, _color, fogAlpha, _directionalIntensity );
+        material.draw( _ctx, _color, fogAlpha, _intensity );
       } else {
         material.draw( _ctx, fogAlpha );
       }

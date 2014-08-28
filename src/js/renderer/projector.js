@@ -7,6 +7,7 @@ var Box3 = require( '../math/Box3' );
 
 var Quad = require( '../geometry/quad' );
 
+var DirectionalLight = require( '../lights/directional-light' );
 var Material = require( '../materials/material' );
 
 var RenderableObject = require( './renderable-object' );
@@ -20,7 +21,8 @@ function Projector() {
   _face, _faceCount = 0, _facePool = [],
   _quadCount = 0, _quadPool = [],
 
-  _renderData = { objects: [], elements: [] },
+  _renderData = { objects: [], lights: [], elements: [] },
+  // Custom variable for per-object face z-sorting.
   _elements = [],
 
   _vector3 = new Vector3(),
@@ -39,8 +41,7 @@ function Projector() {
   _normalMatrix = new Matrix3();
 
   function RenderList() {
-    var object = null,
-        material = null;
+    var object, material;
 
     function setObject( value ) {
       object = value;
@@ -119,6 +120,7 @@ function Projector() {
 
     _renderData.objects.length = 0;
     _renderData.elements.length = 0;
+    _renderData.lights.length = 0;
 
     var object;
     var i, il;
@@ -129,6 +131,10 @@ function Projector() {
       }
 
       object.updateMatrix();
+
+      if ( object instanceof DirectionalLight ) {
+        _renderData.lights.push( object );
+      }
 
       _object = getNextObjectInPool();
       _object.object = object;

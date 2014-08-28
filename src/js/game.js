@@ -21,13 +21,10 @@ function Game( width, height ) {
   this.setSize( width, height );
 
   this.scene = [];
-
-  this.lights = [];
   this.ambient = new Color();
 
   this.renderer = new Renderer({
     ctx: this.ctx,
-    lights: this.lights,
     ambient: this.ambient
   });
 
