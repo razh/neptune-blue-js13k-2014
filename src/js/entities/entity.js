@@ -12,6 +12,4 @@ function Entity( geometry, material ) {
 Entity.prototype = Object.create( Object3D.prototype );
 Entity.prototype.constructor = Entity;
 
-Entity.prototype.update = function() {};
-
 module.exports = Entity;

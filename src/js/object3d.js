@@ -21,6 +21,8 @@ function Object3D() {
   this.visible = true;
 }
 
+Object3D.prototype.update = function() {};
+
 Object3D.prototype.updateMatrix = function() {
   this.matrix.makeRotationFromQuaternion( this.quaternion );
   this.matrix.scale( this.scale );
