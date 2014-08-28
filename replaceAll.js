@@ -18,6 +18,8 @@ var substitutions = {
   '.nr': '.normalize',
   '.ib': '.isIntersectionBox',
   '.aa': '.setFromAxisAngle',
+  '.gI': '.getInverse',
+  '.tr': '.transpose',
   '.mWI': '.matrixWorldInverse',
   '.mW': '.matrixWorld',
   '.mP': '.setFromMatrixPosition',
@@ -27,10 +29,44 @@ var substitutions = {
   '.ma': '.material',
   '.po': '.position',
   '.mS': '.multiplyScalar',
+  '.uM': '.updateMatrix',
+  '.fi': '.filter',
+  '.rgb': '.setRGB',
+  '.ca': '.camera',
+  '.sV': '.subVectors',
+  '.pM': '.projectionMatrix',
+  '.cFN': '.computeFaceNormals',
   'cTV': 'checkTriangleVisibility',
   'cBF': 'checkBackfaceVisibility',
-  'cBC': 'checkBackfaceCulling'
+  'cBC': 'checkBackfaceCulling',
+  '.sFP': '.setFromPoints',
+  '.eP': '.expandByPoint',
+  // Color properties.
+  'am': 'ambient',
+  'di': 'diffuse',
+  'em': 'emissive',
+  'tC': 'strokeColor',
+  // Browserify warnings.
+  'NF': 'MODULE_NOT_FOUND',
+  'N': 'Cannot find module '
 };
+
+var exclude = [
+  'fillStyle',
+  'strokeStyle',
+  'lineWidth',
+  'shadowColor',
+  'shadowBlur',
+  'beginPath',
+  'moveTo',
+  'lineTo',
+  'setTransform',
+  'translate',
+  'fill',
+  'stroke',
+  'innerWidth',
+  'innerHeight'
+];
 
 module.exports = function() {
 
