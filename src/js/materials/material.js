@@ -44,7 +44,11 @@ Material.prototype.set = function( ctx ) {
   ctx.globalCompositeOperation = this.blending;
 };
 
-Material.prototype.draw = function( ctx ) {
+Material.prototype.draw = function( ctx, alpha ) {
+  if ( !this.batch && alpha !== undefined ) {
+    ctx.globalAlpha = this.opacity * alpha;
+  }
+
   if ( this.fillVisible ) {
     ctx.fill();
   }

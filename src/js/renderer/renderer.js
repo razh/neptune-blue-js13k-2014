@@ -2,6 +2,7 @@
 
 var Color = require( '../math/color' );
 var Vector3 = require( '../math/vector3' );
+var Utils = require( '../math/utils' );
 
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
@@ -41,6 +42,7 @@ function Renderer( options ) {
   _ambientLight = options.ambient || new Color(),
   _directionalLights = options.lights,
   _directionalIntensity = 0,
+  _fogDensity,
 
   _vector3 = new Vector3();
 
@@ -84,6 +86,8 @@ function Renderer( options ) {
     _renderData = _projector.projectScene( scene, camera );
     _elements = _renderData.elements;
     _camera = camera;
+
+    _fogDensity = scene.fogDensity;
 
     var element, material, prevMaterial;
     var isQuad;
@@ -214,17 +218,33 @@ function Renderer( options ) {
       _this.info.render.faces++;
     }
 
-    if ( material instanceof LambertMaterial ) {
-      _diffuseColor.copy( material.color );
-      _emissiveColor.copy( material.emissive );
-      _color.copy( _ambientLight );
+    var fogAlpha = 1;
+    if ( !material.batch ) {
+      // Compute fogAlpha.
+      if ( _fogDensity ) {
+        var w = v0.positionScreen.w + v1.positionScreen.w + v2.positionScreen.w;
+        w = isQuad ? ( ( w + v3.positionScreen.w ) / 4 ) : w / 3;
+        // w here is clip.w, where gl_FragCoord.w = 1 / clip.w.
+        var depth = element.z * w;
 
-      _directionalIntensity = calculateLight( element, material, _color );
+        fogAlpha = Utils.clamp(
+          Math.pow( 2, -_fogDensity * _fogDensity * depth * depth / Math.LN2 ),
+          0, 1
+        );
+      }
 
-      _color.multiply( _diffuseColor ).add( _emissiveColor );
-      material.draw( _ctx, _color, _directionalIntensity );
-    } else if ( !material.batch ) {
-      material.draw( _ctx );
+      if ( material instanceof LambertMaterial ) {
+        _diffuseColor.copy( material.color );
+        _emissiveColor.copy( material.emissive );
+        _color.copy( _ambientLight );
+
+        _directionalIntensity = calculateLight( element, material, _color );
+
+        _color.multiply( _diffuseColor ).add( _emissiveColor );
+        material.draw( _ctx, _color, fogAlpha, _directionalIntensity );
+      } else {
+        material.draw( _ctx, fogAlpha );
+      }
     }
   }
 

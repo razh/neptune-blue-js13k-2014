@@ -14,9 +14,9 @@ function LambertGlowMaterial( options ) {
 LambertGlowMaterial.prototype = Object.create( LambertMaterial.prototype );
 LambertGlowMaterial.prototype.constructor = LambertGlowMaterial;
 
-LambertGlowMaterial.prototype.draw = function( ctx, color, intensity ) {
+LambertGlowMaterial.prototype.draw = function( ctx, color, alpha, intensity ) {
   ctx.shadowBlur = this.blur * intensity;
-  LambertMaterial.prototype.draw.call( this, ctx, color );
+  LambertMaterial.prototype.draw.call( this, ctx, color, alpha );
 };
 
 module.exports = LambertGlowMaterial;

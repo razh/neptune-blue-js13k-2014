@@ -16,9 +16,9 @@ function LambertMaterial( options ) {
 LambertMaterial.prototype = Object.create( Material.prototype );
 LambertMaterial.prototype.constructor = LambertMaterial;
 
-LambertMaterial.prototype.draw = function( ctx, color ) {
+LambertMaterial.prototype.draw = function( ctx, color, alpha ) {
   ctx.fillStyle = color.toString();
-  Material.prototype.draw.call( this, ctx );
+  Material.prototype.draw.call( this, ctx, alpha );
 };
 
 module.exports = LambertMaterial;
