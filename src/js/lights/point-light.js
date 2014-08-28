@@ -1,19 +1,14 @@
 'use strict';
 
-var Object3D = require( '../object3d' );
-var Filter = require( '../math/filter' );
+var DirectionalLight = require( './directional-light' );
 
 function PointLight( color, intensity, distance ) {
-  Object3D.call( this );
+  DirectionalLight.call( this, color, intensity );
 
-  this.color = color || 0;
-  this.intensity = intensity || 0;
   this.distance = distance || 0;
-
-  this.filter = new Filter();
 }
 
-PointLight.prototype = Object.create( Object3D.prototype );
+PointLight.prototype = Object.create( DirectionalLight.prototype );
 PointLight.prototype.constructor = PointLight;
 
 module.exports = PointLight;
