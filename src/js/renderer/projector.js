@@ -100,7 +100,6 @@ function Projector() {
 
     return {
       setObject: setObject,
-      projectVertex: projectVertex,
       pushVertex: pushVertex,
       checkTriangleVisibility: checkTriangleVisibility,
       checkBackfaceCulling: checkBackfaceCulling,
