@@ -6,19 +6,18 @@ var Camera = require( './camera' );
 var Renderer = require( './renderer/renderer' );
 
 function Game( width, height ) {
-  width  = width  || window.innerWidth;
-  height = height || window.innerHeight;
-
   this.canvas = document.createElement( 'canvas' );
   this.ctx = this.canvas.getContext( '2d' );
 
   this.running = false;
-  this.prevTime = 0;
-  this.currTime = 0;
+  this.pt = 0;
+  this.t = 0;
 
-  this.fov = 90;
-  this.camera = new Camera( this.fov );
-  this.setSize( width, height );
+  this.camera = new Camera( 90 );
+  this.setSize(
+    width  || window.innerWidth,
+    height || window.innerHeight
+  );
 
   this.scene = [];
   this.ambient = new Color();
@@ -42,9 +41,9 @@ Game.prototype.tick = function() {
 };
 
 Game.prototype.update = function() {
-  this.currTime = Date.now();
-  var dt = this.currTime - this.prevTime;
-  this.prevTime = this.currTime;
+  this.t = Date.now();
+  var dt = this.t - this.pt;
+  this.pt = this.t;
 
   if ( dt > 1e2 ) {
     dt = 1e2;
@@ -63,7 +62,7 @@ Game.prototype.draw = function() {
 
 Game.prototype.play = function() {
   this.running = true;
-  this.prevTime = Date.now();
+  this.pt = Date.now();
   requestAnimationFrame( this.tick );
 };
 
