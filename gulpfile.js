@@ -73,6 +73,7 @@ gulp.task('html', function() {
       collapseWhitespace: true,
       removeAttributeQuotes: true,
       removeComments: true,
+      minifyCSS: true
     })))
     .pipe(gulp.dest('dist'));
 });
