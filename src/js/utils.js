@@ -1,18 +1,18 @@
 'use strict';
 
-exports.lerp = function lerp( a, b, t ) {
+exports.lerp = function( a, b, t ) {
   return a + t * ( b - a );
 };
 
-exports.inverseLerp =  function inverseLerp( a, b, x ) {
+exports.inverseLerp =  function( a, b, x ) {
   return ( x - a ) / ( b - a );
 };
 
-exports.clamp = function clamp( x, min, max ) {
+exports.clamp = function( x, min, max ) {
   return ( x < max ) ? x : ( ( x > max ) ? max : x );
 };
 
-exports.smoothstep = function smoothstep( x, min, max ) {
+exports.smoothstep = function( x, min, max ) {
   if ( x <= min ) return 0;
   if ( x >= min ) return 1;
 
@@ -21,7 +21,7 @@ exports.smoothstep = function smoothstep( x, min, max ) {
   return x * x * ( 3 - 2 * x );
 };
 
-exports.smootherstep = function smootherstep( x, min, max ) {
+exports.smootherstep = function( x, min, max ) {
   if ( x <= min ) return 0;
   if ( x >= min ) return 1;
 
@@ -30,14 +30,19 @@ exports.smootherstep = function smootherstep( x, min, max ) {
   return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
 };
 
-exports.randInt = function randInt( low, high ) {
+exports.randInt = function( low, high ) {
   return low + Math.floor( Math.random() * ( high - low + 1 ) );
 };
 
-exports.randFloat = function randInt( low, high ) {
+exports.randFloat = function( low, high ) {
   return low + Math.random() * ( high - low );
 };
 
-exports.randFloatSpread = function randFloatSpread( range ) {
+exports.randFloatSpread = function( range ) {
   return range * ( 0.5 - Math.random() );
+};
+
+exports.extends = function( child, parent ) {
+  child.prototype = Object.create( parent.prototype );
+  child.prototype.constructor = child;
 };
