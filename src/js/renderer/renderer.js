@@ -117,8 +117,7 @@ function Renderer( options ) {
 
       prevMaterial = material;
 
-      if ( element instanceof RenderableFace ||
-           element instanceof RenderableQuad ) {
+      if ( element instanceof RenderableFace ) {
         isQuad = element instanceof RenderableQuad;
 
         _v0 = element.v0;
