@@ -2,7 +2,7 @@
 
 var Color = require( '../math/color' );
 var Vector3 = require( '../math/vector3' );
-var Utils = require( '../math/utils' );
+var Utils = require( '../utils' );
 
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );

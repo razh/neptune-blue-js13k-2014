@@ -1,7 +1,7 @@
 /*jshint bitwise:false*/
 'use strict';
 
-var lerp = require( './utils' ).lerp;
+var lerp = require( '../utils' ).lerp;
 
 // RGB values are floats from [0, 1].
 function Color( r, g, b ) {
