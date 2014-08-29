@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var RenderableVertex = require( './renderable-vertex' );
 var RenderableFace = require( './renderable-Face' );
 
@@ -8,7 +9,6 @@ function RenderableQuad() {
   this.v3 = new RenderableVertex();
 }
 
-RenderableQuad.prototype = Object.create( RenderableFace.prototype );
-RenderableQuad.prototype.constructor = RenderableQuad;
+_.extends( RenderableQuad, RenderableFace );
 
 module.exports = RenderableQuad;

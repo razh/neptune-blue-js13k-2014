@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var LambertMaterial = require( './lambert-material' );
 var Filter = require( '../math/filter' );
 
@@ -11,8 +12,7 @@ function LambertGlowMaterial( options ) {
   this.filter = new Filter();
 }
 
-LambertGlowMaterial.prototype = Object.create( LambertMaterial.prototype );
-LambertGlowMaterial.prototype.constructor = LambertGlowMaterial;
+_.extends( LambertGlowMaterial, LambertMaterial );
 
 LambertGlowMaterial.prototype.draw = function( ctx, color, alpha, intensity ) {
   ctx.shadowBlur = this.blur * intensity;

@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var Color = require( '../math/color' );
 var Material = require( './material' );
 
@@ -13,8 +14,7 @@ function LambertMaterial( options ) {
   this.batch = false;
 }
 
-LambertMaterial.prototype = Object.create( Material.prototype );
-LambertMaterial.prototype.constructor = LambertMaterial;
+_.extends( LambertMaterial, Material );
 
 LambertMaterial.prototype.draw = function( ctx, color, alpha ) {
   ctx.fillStyle = color.toString();

@@ -56,6 +56,8 @@ var substitutions = {
   'di': 'diffuse',
   'em': 'emissive',
   'tC': 'strokeColor',
+  // Utils.
+  '.e': '.extends',
   // Browserify warnings.
   'NF': 'MODULE_NOT_FOUND',
   'N': 'Cannot find module '

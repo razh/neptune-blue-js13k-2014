@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var DirectionalLight = require( './directional-light' );
 
 function PointLight( color, intensity, distance ) {
@@ -8,7 +9,6 @@ function PointLight( color, intensity, distance ) {
   this.distance = distance || 0;
 }
 
-PointLight.prototype = Object.create( DirectionalLight.prototype );
-PointLight.prototype.constructor = PointLight;
+_.extends( PointLight, DirectionalLight );
 
 module.exports = PointLight;

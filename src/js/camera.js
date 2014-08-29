@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( './utils' );
 var Object3D = require( './object3d' );
 var Vector3 = require( './math/vector3' );
 var Matrix4 = require( './math/matrix4' );
@@ -23,8 +24,7 @@ function Camera( fov, aspect, near, far ) {
   this.updateProjectionMatrix();
 }
 
-Camera.prototype = Object.create( Object3D.prototype );
-Camera.prototype.constructor = Camera;
+_.extends( Camera, Object3D );
 
 Camera.prototype.lookAt = function( vector ) {
   mt.lookAt( this.position, vector, Vector3.Y );

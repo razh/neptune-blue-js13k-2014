@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var Object3D = require( '../object3d' );
 
 function Entity( geometry, material ) {
@@ -9,7 +10,6 @@ function Entity( geometry, material ) {
   this.material = material;
 }
 
-Entity.prototype = Object.create( Object3D.prototype );
-Entity.prototype.constructor = Entity;
+_.extends( Entity, Object3D );
 
 module.exports = Entity;
