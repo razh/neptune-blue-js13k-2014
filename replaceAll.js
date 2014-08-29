@@ -20,8 +20,7 @@ var substitutions = {
   '.dT': '.distanceTo',
   '.nM': '.getNormalMatrix',
   '.mM': '.multiplyMatrices',
-  '.nr': '.normalize',
-  '.ib': '.isIntersectionBox',
+  '.nz': '.normalize',
   '.aa': '.setFromAxisAngle',
   '.gI': '.getInverse',
   '.tr': '.transpose',
@@ -31,21 +30,27 @@ var substitutions = {
   '.mP': '.setFromMatrixPosition',
   '.mRQ': '.makeRotationFromQuaternion',
   '.mQ': '.multiplyQuaternions',
-  '.qu': '.quaternion',
+  '.qu': /\.quaternion(?!\w+)/g,
   '.sR': '.setFromRotationMatrix',
   '.nm': '.normalModel',
-  '.nl': '.normal',
+  '.nr': '.normal',
   '.id': '.identity',
-  '.ma': '.material',
+  '.mt': '.material',
   '.po': '.position',
   '.mS': '.multiplyScalar',
   '.uM': '.updateMatrix',
-  '.fi': '.filter',
   '.rgb': '.setRGB',
-  '.ca': '.camera',
   '.sV': '.subVectors',
   '.pM': '.projectionMatrix',
+  '.mx': /\.matrix(?!\w+)/g,
   '.cFN': '.computeFaceNormals',
+  '.ds': /\.distance(?!\w+)/g,
+  // Camera.
+  '.ca': '.camera',
+  '.as': '.aspect',
+  // Render data.
+  'ls': /lights(?!\w+)/g,
+  'os': /objects(?!\w+)/g,
   // Render list.
   'sO': 'setObject',
   'cTV': 'checkTriangleVisibility',
@@ -53,17 +58,23 @@ var substitutions = {
   // Bounding box.
   '.sFP': '.setFromPoints',
   '.eP': '.expandByPoint',
+  '.iB': '.isIntersectionBox',
   '.vi': '.visible',
   '.ve': '.vertices',
-  'el': 'elements',
   '.fa': '.faces',
-  '.sc': '.scene',
-  '.ud': '.update',
+  '.qd': '.quads',
+  'el': 'elements',
+  '.se': '.scene',
+  '.rr': '.renderer',
+  '.rg': '.running',
+  '.ud': /\.update(?!\w+)/g,
   '.cp': '.copy',
-  '.ba': '.batch',
-  '.mul': '.multiply',
+  '.mul': /\.multiply(?!\w+)/g,
+  '.sc': /\.scale(?!\w+)/g,
+  '.sP': /\.setPosition(?!\w+)/g,
   '.pS': '.projectScene',
   // Filter properties.
+  '.fi': '.filter',
   '.cB': '.categoryBits',
   '.mB': '.maskBits',
   '.grI': '.groupIndex',
@@ -72,15 +83,17 @@ var substitutions = {
   'wf': 'wireframe',
   'op': 'opacity',
   'bl': 'blending',
+  'bh': 'batch',
   // Material sides.
   '.DS': '.DoubleSide',
   '.FS': '.FrontSide',
   '.BS': '.BackSide',
   // Color properties.
   'am': 'ambient',
-  'di': 'diffuse',
+  'df': 'diffuse',
   'em': 'emissive',
   'tC': 'strokeColor',
+  'cr': 'color',
   // Utils.
   '.e': '.extends',
   // Browserify warnings.
@@ -119,7 +132,8 @@ module.exports = function() {
 
       Object.keys(substitutions).forEach(function(key) {
         var value = substitutions[key];
-        var regex = new RegExp(value.replace('.', '\\.'), 'g');
+        var regex = value instanceof RegExp ? value
+         : new RegExp(value.replace('.', '\\.'), 'g');
         contents = contents.replace(regex, key);
       });
 
