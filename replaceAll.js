@@ -59,6 +59,7 @@ var substitutions = {
   '.sFP': '.setFromPoints',
   '.eP': '.expandByPoint',
   '.iB': '.isIntersectionBox',
+  '.bB': '.boundingBox',
   '.vi': '.visible',
   '.ve': '.vertices',
   '.fa': '.faces',
