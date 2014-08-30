@@ -8,7 +8,7 @@ var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
 var LambertGlowMaterial = require( '../../../src/js/materials/lambert-glow-material' );
-var Entity = require( '../../../src/js/entities/entity' );
+var Mesh = require( '../../../src/js/objects/mesh' );
 var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
@@ -77,8 +77,8 @@ window.WavesTest = function() {
     opacity: 0.5
   });
 
-  var entity = new Entity( planeGeometry, material );
-  game.scene.push( entity );
+  var mesh = new Mesh( planeGeometry, material );
+  game.scene.push( mesh );
 
   game.ambient.setRGB( 0.5, 0.5, 0.5 );
 
@@ -99,7 +99,7 @@ window.WavesTest = function() {
 
   var time = 0;
   var offset = 0;
-  entity.update = function( dt ) {
+  mesh.update = function( dt ) {
     time += dt;
     var vertices = planeGeometry.vertices;
     var x, z;

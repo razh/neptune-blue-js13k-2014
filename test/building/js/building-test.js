@@ -6,7 +6,7 @@ var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
 var LambertGlowMaterial = require( '../../../src/js/materials/lambert-glow-material' );
-var Entity = require( '../../../src/js/entities/entity' );
+var Mesh = require( '../../../src/js/objects/mesh' );
 var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
@@ -77,8 +77,8 @@ window.BuildingTest = function() {
     blur: 16
   });
 
-  var entity = new Entity( boxGeometry, material );
-  scene.push( entity );
+  var mesh = new Mesh( boxGeometry, material );
+  scene.push( mesh );
 
   var light = new DirectionalLight( new Color( 0.5, 0.5, 0.5 ) );
   light.position.set( -10, 0, 5 );
@@ -92,7 +92,7 @@ window.BuildingTest = function() {
   game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
   game.camera.position.set( -2, 5, -4 );
-  game.camera.lookAt( entity.position );
+  game.camera.lookAt( mesh.position );
   game.camera.updateProjectionMatrix();
 
   var controls = new Controls( game.camera );

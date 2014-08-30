@@ -51,8 +51,8 @@ Game.prototype.update = function() {
 
   dt *= 1e-3;
 
-  this.scene.forEach(function( entity ) {
-    entity.update( dt );
+  this.scene.forEach(function( object ) {
+    object.update( dt );
   });
 };
 

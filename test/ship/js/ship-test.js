@@ -6,7 +6,7 @@ var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
 var LambertGlowMaterial = require( '../../../src/js/materials/lambert-glow-material' );
-var Entity = require( '../../../src/js/entities/entity' );
+var Mesh = require( '../../../src/js/objects/mesh' );
 var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
@@ -177,8 +177,8 @@ window.ShipTest = function() {
     lineWidth: 1
   });
 
-  var entity = new Entity( shipGeometry, material );
-  game.scene.push( entity );
+  var mesh = new Mesh( shipGeometry, material );
+  game.scene.push( mesh );
 
   game.ambient.setRGB( 0.4, 0.4, 0.4 );
 
@@ -195,17 +195,20 @@ window.ShipTest = function() {
   var time = 0;
   var prev = 0;
   var rotateZ = 0;
-  entity.update = function( dt ) {
+  mesh.update = function( dt ) {
     if ( !movement ) {
       return;
     }
 
+    // Undo previous rotation.
+    mesh.rotateZ( -prev );
+
     time += dt;
-    entity.rotateZ( -prev );
     rotateZ = Math.sin( time );
-    entity.rotateZ( rotateZ );
+    mesh.rotateZ( rotateZ );
     prev = rotateZ;
-    entity.position.x = 3 * Math.sin( time );
+
+    mesh.position.x = 3 * Math.sin( time );
   };
 
   game.play();

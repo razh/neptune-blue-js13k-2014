@@ -6,7 +6,7 @@ var Geometry = require( './geometry/geometry' );
 var Material = require( './materials/material' );
 var LambertMaterial = require( './materials/lambert-material' );
 var LambertGlowMaterial = require( './materials/lambert-glow-material' );
-var Entity = require( './entities/entity' );
+var Mesh = require( './objects/mesh' );
 var DirectionalLight = require( './lights/directional-light' );
 
 var game = new Game(
@@ -56,8 +56,8 @@ var material = new LambertGlowMaterial({
   blur: 32
 });
 
-var entity = new Entity( geometry, material );
-scene.push( entity );
+var mesh = new Mesh( geometry, material );
+scene.push( mesh );
 
 game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
@@ -76,12 +76,12 @@ scene.push( light3 );
 game.ambient.setRGB( 0.5, 0.5, 0.5 );
 
 game.camera.position.set( 0, -1, -2 );
-game.camera.lookAt( entity.position );
+game.camera.lookAt( mesh.position );
 game.camera.updateProjectionMatrix();
 
 game.play();
 var time = 0;
-entity.update = function( dt ) {
+mesh.update = function( dt ) {
   this.rotateY( 90 * Math.PI / 180 * dt );
   // this.rotateX( 20 * Math.PI / 180 * dt );
   time += dt;

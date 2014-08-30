@@ -7,7 +7,7 @@ var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
 var LambertGlowMaterial = require( '../../../src/js/materials/lambert-glow-material' );
-var Entity = require( '../../../src/js/entities/entity' );
+var Mesh = require( '../../../src/js/objects/mesh' );
 var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
@@ -80,7 +80,7 @@ function createTrackGeometry( radius, length, panelSpacing ) {
     +------------------+  ---
 
  */
-function createTrackEntities( options ) {
+function createTrackMeshes( options ) {
   options = options || {};
 
   var count = options.count || 0;
@@ -100,31 +100,31 @@ function createTrackEntities( options ) {
     shadowBlur: 32
   });
 
-  var entities = [];
+  var meshes = [];
 
-  var entity;
+  var mesh;
   for ( var i = 0; i < count; i++ ) {
-    entity = new Entity( geometry, material );
-    entity.position.z = i * ( length + sectionSpacing );
-    entities.push( entity );
+    mesh = new Mesh( geometry, material );
+    mesh.position.z = i * ( length + sectionSpacing );
+    meshes.push( mesh );
   }
 
-  return entities;
+  return meshes;
 }
 
 window.TrackTest = function() {
   var game = new Game( 568, 320 );
   document.body.appendChild( game.canvas );
 
-  game.scene = game.scene.concat(createTrackEntities({
+  game.scene = game.scene.concat(createTrackMeshes({
     count: 5
   }));
 
   game.camera.position.set( 0, 2, -4 );
 
-  var lastEntity = game.scene[ game.scene.length - 1 ];
+  var lastMesh = game.scene[ game.scene.length - 1 ];
   var controls = new Controls( game.camera );
-  var target = new Vector3().copy( lastEntity.position );
+  var target = new Vector3().copy( lastMesh.position );
   target.y = 2;
   controls.target = target;
   game.camera.lookAt( target );

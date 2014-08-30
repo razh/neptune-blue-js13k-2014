@@ -3,13 +3,13 @@
 var _ = require( '../utils' );
 var Object3D = require( '../object3d' );
 
-function Entity( geometry, material ) {
+function Mesh( geometry, material ) {
   Object3D.call( this );
 
   this.geometry = geometry;
   this.material = material;
 }
 
-_.extends( Entity, Object3D );
+_.extends( Mesh, Object3D );
 
-module.exports = Entity;
+module.exports = Mesh;
