@@ -12,17 +12,17 @@ var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
 
-function createTrackGeometry( radius, length, panelSpacing ) {
+function createTrackGeometry( radius, length, spacing ) {
   var height = radius * Math.sin( Math.PI / 3 );
 
   var geometry = new Geometry().push(
     // Vertices.
     [
       // Left panel.
-      radius / 2 + panelSpacing, 0, 0,
-      radius + panelSpacing, height, 0,
-      radius + panelSpacing, height, -length,
-      radius / 2 + panelSpacing, 0, -length,
+      radius / 2 + spacing, 0, 0,
+      radius + spacing, height, 0,
+      radius + spacing, height, -length,
+      radius / 2 + spacing, 0, -length,
 
       // Center panel.
       -( radius / 2 ), 0, 0,
@@ -31,10 +31,10 @@ function createTrackGeometry( radius, length, panelSpacing ) {
       -( radius / 2 ), 0, -length,
 
       // Right panel.
-      -( radius + panelSpacing ), height, 0,
-      -( radius / 2 + panelSpacing ), 0, 0,
-      -( radius / 2 + panelSpacing ), 0, -length,
-      -( radius + panelSpacing ), height, -length
+      -( radius + spacing ), height, 0,
+      -( radius / 2 + spacing ), 0, 0,
+      -( radius / 2 + spacing ), 0, -length,
+      -( radius + spacing ), height, -length
     ],
     // Faces.
     [
@@ -54,7 +54,7 @@ function createTrackGeometry( radius, length, panelSpacing ) {
 
   Cross-section.
 
-            radius + panelSpacing
+            radius + spacing
               |---------|
     \                  /
      \                /
@@ -68,7 +68,7 @@ function createTrackGeometry( radius, length, panelSpacing ) {
     +------------------+
     |                  |
     +------------------+  ---
-                           | Panel spacing.
+                           | Spacing.
     +------------------+  ---
     |                  |
     |                  |  ---
@@ -86,10 +86,10 @@ function createTrackMeshes( options ) {
   var count = options.count || 0;
   var radius = options.radius || 5;
   var length = options.length || 3;
-  var sectionSpacing = options.sectionSpacing || 0.5;
-  var panelSpacing = options.panelSpacing || 0.5;
+  var meshSpacing = options.meshSpacing || 0.5;
+  var spacing = options.spacing || 0.5;
 
-  var geometry = createTrackGeometry( radius, length, panelSpacing );
+  var geometry = createTrackGeometry( radius, length, spacing );
 
   var material = new Material({
     color: new Color( 1, 0.8, 0.75 ),
@@ -105,7 +105,7 @@ function createTrackMeshes( options ) {
   var mesh;
   for ( var i = 0; i < count; i++ ) {
     mesh = new Mesh( geometry, material );
-    mesh.position.z = i * ( length + sectionSpacing );
+    mesh.position.z = i * ( length + meshSpacing );
     meshes.push( mesh );
   }
 
@@ -132,3 +132,6 @@ window.TrackTest = function() {
 
   game.play();
 };
+
+exports.createTrackGeometry = createTrackGeometry;
+exports.createTrackMeshes = createTrackMeshes;

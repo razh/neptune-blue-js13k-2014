@@ -11,62 +11,61 @@ var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
 
+// Generate building geometry.
+// Origin is at the center of the bottom face.
+function addBoxGeometry( geometry, width, height, depth, dx, dy, dz ) {
+  dx = dx || 0;
+  dy = dy || 0;
+  dz = dz || 0;
+
+  var halfWidth = width / 2,
+      halfDepth = depth / 2;
+
+  var vertices = [
+    // Counterclockwise from far left.
+    // Bottom.
+    -halfWidth, 0, -halfDepth,
+    -halfWidth, 0,  halfDepth,
+    halfWidth,  0,  halfDepth,
+    halfWidth,  0, -halfDepth,
+    // Top.
+    -halfWidth, height, -halfDepth,
+    -halfWidth, height,  halfDepth,
+    halfWidth,  height,  halfDepth,
+    halfWidth,  height, -halfDepth
+  ];
+
+  for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
+    vertices[ i     ] += dx;
+    vertices[ i + 1 ] += dy;
+    vertices[ i + 2 ] += dz;
+  }
+
+  var faces = [
+    // Sides.
+    [ 0, 1, 5, 4 ],
+    [ 1, 2, 6, 5 ],
+    [ 2, 3, 7, 6 ],
+    [ 3, 0, 4, 7 ],
+
+    // Top.
+    [ 4, 5, 6, 7 ]
+  ];
+
+  return geometry.push( vertices, faces );
+}
+
 window.BuildingTest = function() {
   var game = new Game( 568, 320 );
   document.body.appendChild( game.canvas );
 
   var scene = game.scene;
 
-  // Generate building geometry.
-  // Origin is at the center of the bottom face.
-  function addBox( geometry, width, height, depth, dx, dy, dz ) {
-    dx = dx || 0;
-    dy = dy || 0;
-    dz = dz || 0;
-
-    var halfWidth = width / 2,
-        halfDepth = depth / 2;
-
-    var vertices = [
-      // Counterclockwise from far left.
-      // Bottom.
-      -halfWidth, 0, -halfDepth,
-      -halfWidth, 0,  halfDepth,
-      halfWidth,  0,  halfDepth,
-      halfWidth,  0, -halfDepth,
-      // Top.
-      -halfWidth, height, -halfDepth,
-      -halfWidth, height,  halfDepth,
-      halfWidth,  height,  halfDepth,
-      halfWidth,  height, -halfDepth
-    ];
-
-    for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
-      vertices[ i     ] += dx;
-      vertices[ i + 1 ] += dy;
-      vertices[ i + 2 ] += dz;
-    }
-
-    var faces = [
-      // Sides.
-      [ 0, 1, 5, 4 ],
-      [ 1, 2, 6, 5 ],
-      [ 2, 3, 7, 6 ],
-      [ 3, 0, 4, 7 ],
-
-      // Top.
-      [ 4, 5, 6, 7 ]
-    ];
-
-    return geometry.push( vertices, faces );
-  }
-
-
   var boxGeometry = new Geometry();
-  addBox( boxGeometry, 1, 2.5, 1 );
-  addBox( boxGeometry, 1, 3, 1, 2, 0, 0 );
-  addBox( boxGeometry, 1.5, 2, 1, -2, 0, 0 );
-  addBox( boxGeometry, 4, 1.5, 1, 0, 0, 2 );
+  addBoxGeometry( boxGeometry, 1, 2.5, 1 );
+  addBoxGeometry( boxGeometry, 1, 3, 1, 2, 0, 0 );
+  addBoxGeometry( boxGeometry, 1.5, 2, 1, -2, 0, 0 );
+  addBoxGeometry( boxGeometry, 4, 1.5, 1, 0, 0, 2 );
   boxGeometry.computeFaceNormals();
 
   var material = new LambertGlowMaterial({
@@ -83,11 +82,11 @@ window.BuildingTest = function() {
   var light = new DirectionalLight( new Color( 0.5, 0.5, 0.5 ) );
   light.position.set( -10, 0, 5 );
   light.filter.maskBits = 0;
-  game.scene.push( light );
+  scene.push( light );
 
   var light2 = new DirectionalLight( new Color( 1, 1, 1 ) );
   light2.position.set( 0, 10, 0 );
-  game.scene.push( light2 );
+  scene.push( light2 );
 
   game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
@@ -99,3 +98,5 @@ window.BuildingTest = function() {
 
   game.play();
 };
+
+exports.addBoxGeometry = addBoxGeometry;

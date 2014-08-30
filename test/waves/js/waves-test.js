@@ -115,3 +115,5 @@ window.WavesTest = function() {
 
   game.play();
 };
+
+exports.createPlaneGeometry = createPlaneGeometry;

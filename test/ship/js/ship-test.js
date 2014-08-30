@@ -213,3 +213,7 @@ window.ShipTest = function() {
 
   game.play();
 };
+
+exports.addFuselageGeometry = addFuselageGeometry;
+exports.addWingGeometry = addWingGeometry;
+exports.createShipGeometry = createShipGeometry;
