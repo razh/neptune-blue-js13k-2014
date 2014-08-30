@@ -9,7 +9,7 @@ exports.inverseLerp =  function( a, b, x ) {
 };
 
 exports.clamp = function( x, min, max ) {
-  return ( x < max ) ? x : ( ( x > max ) ? max : x );
+  return ( x < min ) ? min : ( ( x > max ) ? max : x );
 };
 
 exports.smoothstep = function( x, min, max ) {
