@@ -2,9 +2,6 @@
 
 var Game = require( '../../../src/js/game' );
 var Color = require( '../../../src/js/math/color' );
-var Vector3 = require( '../../../src/js/math/vector3' );
-var Face3 = require( '../../../src/js/geometry/face3');
-var Quad = require( '../../../src/js/geometry/quad');
 var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
@@ -44,41 +41,24 @@ window.BuildingTest = function() {
       halfWidth,  height, -halfDepth
     ];
 
-    var offset = geometry.vertices.length;
-    var i, il;
-    for ( i = 0, il = vertices.length; i < il; i += 3 ) {
-      geometry.vertices.push(
-         new Vector3(
-           vertices[ i     ] + dx,
-           vertices[ i + 1 ] + dy,
-           vertices[ i + 2 ] + dz
-         )
-      );
+    for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
+      vertices[ i     ] += dx;
+      vertices[ i + 1 ] += dy;
+      vertices[ i + 2 ] += dz;
     }
 
-    var indices = [
+    var faces = [
       // Sides.
-      0, 1, 5, 4,
-      1, 2, 6, 5,
-      2, 3, 7, 6,
-      3, 0, 4, 7,
+      [ 0, 1, 5, 4 ],
+      [ 1, 2, 6, 5 ],
+      [ 2, 3, 7, 6 ],
+      [ 3, 0, 4, 7 ],
 
       // Top.
-      4, 5, 6, 7,
+      [ 4, 5, 6, 7 ]
     ];
 
-    for ( i = 0, il = indices.length; i < il; i += 4 ) {
-      geometry.faces.push(
-        new Quad(
-          offset + indices[ i     ],
-          offset + indices[ i + 1 ],
-          offset + indices[ i + 2 ],
-          offset + indices[ i + 3 ]
-        )
-      );
-    }
-
-    return geometry;
+    return geometry.push( vertices, faces );
   }
 
 

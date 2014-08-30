@@ -1,8 +1,8 @@
 'use strict';
 
+var _ = require( '../../src/js/utils' );
 var Vector3 = require( '../../src/js/math/vector3' );
 var Quaternion = require( '../../src/js/math/quaternion' );
-var Utils = require( '../../src/js/math/utils' );
 
 Vector3.prototype.sub = function( v ) {
   this.x -= v.x;
@@ -143,7 +143,7 @@ function Controls( object ) {
     phi += phiDelta;
 
     // restrict phi to be betwee EPS and PI-EPS
-    phi = Utils.clamp( phi, EPSILON, Math.PI - EPSILON );
+    phi = _.clamp( phi, EPSILON, Math.PI - EPSILON );
 
     var radius = offset.length() * scale;
 

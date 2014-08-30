@@ -2,9 +2,6 @@
 
 var Game = require( './game' );
 var Color = require( './math/color' );
-var Vector3 = require( './math/vector3' );
-var Face3 = require( './geometry/face3' );
-var Quad = require( './geometry/quad' );
 var Geometry = require( './geometry/geometry' );
 var Material = require( './materials/material' );
 var LambertMaterial = require( './materials/lambert-material' );
@@ -23,21 +20,26 @@ var scene = game.scene;
 
 var geometry = new Geometry();
 
-// Top 4.
-geometry.vertices.push( new Vector3( -0.7, -0.5, -0.7 ) );
-geometry.vertices.push( new Vector3( -0.7, -0.5, 0.7 ) );
-geometry.vertices.push( new Vector3( 0.7, -0.5, 0.7 ) );
-geometry.vertices.push( new Vector3( 0.7, -0.5, -0.7 ) );
-// Bottom
-geometry.vertices.push( new Vector3( 0, 1, 0 ) );
-
-
-geometry.faces.push( new Face3( 0, 1, 4 ) );
-geometry.faces.push( new Face3( 1, 2, 4 ) );
-geometry.faces.push( new Face3( 2, 3, 4 ) );
-geometry.faces.push( new Face3( 3, 0, 4 ) );
-geometry.faces.push( new Quad( 3, 2, 1, 0 ) );
-geometry.computeFaceNormals();
+geometry.push(
+  // Vertices.
+  [
+    // Top 4.
+    -0.7, -0.5, -0.7,
+    -0.7, -0.5, 0.7,
+    0.7, -0.5, 0.7,
+    0.7, -0.5, -0.7,
+    // Bottom
+    0, 1, 0
+  ],
+  // Faces.
+  [
+    [ 0, 1, 4 ],
+    [ 1, 2, 4 ],
+    [ 2, 3, 4 ],
+    [ 3, 0, 4 ],
+    [ 3, 2, 1, 0 ]
+  ]
+).computeFaceNormals();
 
 var material = new LambertGlowMaterial({
   // side: Material.DoubleSide,
@@ -61,15 +63,15 @@ game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
 var light = new DirectionalLight( new Color( 1, 0, 0 ) );
 light.position.set( -10, 0, 0 );
-game.scene.push( light );
+scene.push( light );
 
 var light2 = new DirectionalLight( new Color( 0, 0.4, 0 ) );
 light2.position.set( 0, 10, 0 );
-game.scene.push( light2 );
+scene.push( light2 );
 
 var light3 = new DirectionalLight( new Color( 0, 0, 0.4 ) );
 light3.position.set( 0, -10, 0 );
-game.scene.push( light3 );
+scene.push( light3 );
 
 game.ambient.setRGB( 0.5, 0.5, 0.5 );
 

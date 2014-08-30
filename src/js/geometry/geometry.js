@@ -17,7 +17,7 @@ function Geometry() {
  * Appends the geometry defined by a flat array of vertex data and a 2D array
  * of face indices.
  *
- * faces is an array of indices in the format:
+ * faces is an array of vertex indices with the format:
  *
  *   [
  *     // Face.

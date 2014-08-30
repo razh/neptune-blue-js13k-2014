@@ -3,8 +3,6 @@
 var Game = require( '../../../src/js/game' );
 var Color = require( '../../../src/js/math/color' );
 var Vector3 = require( '../../../src/js/math/vector3' );
-var Face3 = require( '../../../src/js/geometry/face3');
-var Quad = require( '../../../src/js/geometry/quad');
 var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
@@ -15,35 +13,36 @@ var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 var Controls = require( '../../main/controls' );
 
 function createTrackGeometry( radius, length, panelSpacing ) {
-  var geometry = new Geometry();
-
   var height = radius * Math.sin( Math.PI / 3 );
 
-  geometry.vertices = [
-    // Left panel.
-    new Vector3( radius / 2 + panelSpacing, 0, 0 ),
-    new Vector3( radius + panelSpacing, height, 0 ),
-    new Vector3( radius + panelSpacing, height, -length ),
-    new Vector3( radius / 2 + panelSpacing, 0, -length ),
+  var geometry = new Geometry().push(
+    // Vertices.
+    [
+      // Left panel.
+      radius / 2 + panelSpacing, 0, 0,
+      radius + panelSpacing, height, 0,
+      radius + panelSpacing, height, -length,
+      radius / 2 + panelSpacing, 0, -length,
 
-    // Center panel.
-    new Vector3( -( radius / 2 ), 0, 0 ),
-    new Vector3(  ( radius / 2 ), 0, 0 ),
-    new Vector3(  ( radius / 2 ), 0, -length ),
-    new Vector3( -( radius / 2 ), 0, -length ),
+      // Center panel.
+      -( radius / 2 ), 0, 0,
+       ( radius / 2 ), 0, 0,
+       ( radius / 2 ), 0, -length,
+      -( radius / 2 ), 0, -length,
 
-    // Right panel.
-    new Vector3( -( radius + panelSpacing ), height, 0 ),
-    new Vector3( -( radius / 2 + panelSpacing ), 0, 0 ),
-    new Vector3( -( radius / 2 + panelSpacing ), 0, -length ),
-    new Vector3( -( radius + panelSpacing ), height, -length )
-  ];
-
-  geometry.faces = [
-    new Quad( 0, 1, 2, 3 ),
-    new Quad( 4, 5, 6, 7 ),
-    new Quad( 8, 9, 10, 11 )
-  ];
+      // Right panel.
+      -( radius + panelSpacing ), height, 0,
+      -( radius / 2 + panelSpacing ), 0, 0,
+      -( radius / 2 + panelSpacing ), 0, -length,
+      -( radius + panelSpacing ), height, -length
+    ],
+    // Faces.
+    [
+      [ 0, 1, 2, 3 ],
+      [ 4, 5, 6, 7 ],
+      [ 8, 9, 10, 11 ]
+    ]
+  );
 
   geometry.computeFaceNormals();
 

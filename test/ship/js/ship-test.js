@@ -2,9 +2,6 @@
 
 var Game = require( '../../../src/js/game' );
 var Color = require( '../../../src/js/math/color' );
-var Vector3 = require( '../../../src/js/math/vector3' );
-var Face3 = require( '../../../src/js/geometry/face3');
-var Quad = require( '../../../src/js/geometry/quad');
 var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
@@ -23,68 +20,47 @@ function addFuselageGeometry( geometry, forward, aft, width, height ) {
   var halfWidth = width / 2,
       halfHeight = height / 2;
 
-  var vertices = [
-    // Left vertex. :: 0
-    halfWidth, 0, 0,
-    // Right vertex. :: 1
-    -halfWidth, 0, 0,
+  return geometry.push(
+    // Vertices.
+    [
+      // Left vertex. :: 0
+      halfWidth, 0, 0,
+      // Right vertex. :: 1
+      -halfWidth, 0, 0,
 
-    // Top. :: 2
-    0, halfHeight, 0,
-    // Bottom. :: 3
-    0, -halfHeight, 0,
+      // Top. :: 2
+      0, halfHeight, 0,
+      // Bottom. :: 3
+      0, -halfHeight, 0,
 
-    // Front. :: 4
-    0, 0, forward,
-    // Back. :: 5
-    0, 0, -aft
-  ];
+      // Front. :: 4
+      0, 0, forward,
+      // Back. :: 5
+      0, 0, -aft
+    ],
+    // Faces.
+    [
+      // Left faces.
+      // Left top front.
+      [ 0, 2, 4 ],
+      // Left top back.
+      [ 0, 5, 2 ],
+      // Left bottom front.
+      [ 0, 4, 3 ],
+      // Left bottom back.
+      [ 0, 3, 5 ],
 
-  var offset = geometry.vertices.length;
-  var i, il;
-  for ( i = 0, il = vertices.length; i < il; i += 3 ) {
-    geometry.vertices.push(
-      new Vector3(
-        vertices[ i     ],
-        vertices[ i + 1 ],
-        vertices[ i + 2 ]
-      )
-    );
-  }
-
-  var indices = [
-    // Left faces.
-    // Left top front.
-    0, 2, 4,
-    // Left top back.
-    0, 5, 2,
-    // Left bottom front.
-    0, 4, 3,
-    // Left bottom back.
-    0, 3, 5,
-
-    // Right faces.
-    // Right top front.
-    1, 4, 2,
-    // Right top back.
-    1, 2, 5,
-    // Right bottom front.
-    1, 3, 4,
-    // Right bottom back.
-    1, 5, 3
-  ];
-
-  for ( i = 0, il = indices.length; i < il; i += 3 ) {
-    geometry.faces.push(
-      new Face3(
-        offset + indices[ i     ],
-        offset + indices[ i + 1 ],
-        offset + indices[ i + 2 ]
-      )
-    );
-  }
-
-  return geometry;
+      // Right faces.
+      // Right top front.
+      [ 1, 4, 2 ],
+      // Right top back.
+      [ 1, 2, 5 ],
+      // Right bottom front.
+      [ 1, 3, 4 ],
+      // Right bottom back.
+      [ 1, 5, 3 ]
+    ]
+  );
 }
 
 function addWingGeometry( geometry, offsetX, width, height, length, shear, forwardOffsetX, scaleX ) {
@@ -105,36 +81,21 @@ function addWingGeometry( geometry, offsetX, width, height, length, shear, forwa
 
   var indices = [
     // Top.
-    0, 1, 3,
+    [ 0, 1, 3 ],
     // Bottom.
-    0, 3, 2,
+    [ 0, 3, 2 ],
     // Connection.
-    1, 2, 3,
+    [ 1, 2, 3 ],
     // Back.
-    1, 0, 2
+    [ 1, 0, 2 ]
   ];
 
-  var offset = geometry.vertices.length;
-  var i, il;
-  for ( i = 0, il = vertices.length; i < il; i += 3 ) {
-    geometry.vertices.push(
-      new Vector3(
-        scaleX * ( vertices[ i ] + offsetX ),
-        scaleX * vertices[ i + 1 ],
-        vertices[ i + 2 ]
-      )
-    );
+  for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
+    vertices[ i ] = scaleX * ( vertices[ i ] + offsetX );
+    vertices[ i + 1 ] *= scaleX;
   }
 
-  for ( i = 0, il = indices.length; i < il; i += 3 ) {
-    geometry.faces.push(
-      new Face3(
-        offset + indices[ i     ],
-        offset + indices[ i + 1 ],
-        offset + indices[ i + 2 ]
-      )
-    );
-  }
+  return geometry.push( vertices, indices );
 }
 
 function createShipGeometry() {

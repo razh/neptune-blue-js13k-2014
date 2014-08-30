@@ -4,7 +4,6 @@ var Game = require( '../../../src/js/game' );
 var Color = require( '../../../src/js/math/color' );
 var Vector3 = require( '../../../src/js/math/vector3' );
 var Face3 = require( '../../../src/js/geometry/face3');
-var Quad = require( '../../../src/js/geometry/quad');
 var Geometry = require( '../../../src/js/geometry/geometry' );
 var Material = require( '../../../src/js/materials/material' );
 var LambertMaterial = require( '../../../src/js/materials/lambert-material' );
@@ -30,6 +29,7 @@ function createPlaneGeometry( width, height, widthSegments, heightSegments ) {
   var segmentHeight = height / gridZ;
 
   var geometry = new Geometry();
+  var vertices = geometry.vertices;
   var faces = geometry.faces;
 
   var x, z;
@@ -38,12 +38,11 @@ function createPlaneGeometry( width, height, widthSegments, heightSegments ) {
 
     for ( ix = 0; ix < gridX1; ix++ ) {
       x = ix * segmentWidth - widthHalf;
-      geometry.vertices.push( new Vector3( x, 2 * Math.random(), -z ) );
+      vertices.push( new Vector3( x, 0, -z ) );
     }
   }
 
   var a, b, c, d;
-  var face;
   for ( iz = 0; iz < gridZ; iz++ ) {
     for ( ix = 0; ix < gridX; ix++ ) {
       a = ix + gridX1 * iz;
@@ -51,11 +50,8 @@ function createPlaneGeometry( width, height, widthSegments, heightSegments ) {
       c = ( ix + 1 ) + gridX1 * ( iz + 1 );
       d = ( ix + 1 ) + gridX1 * iz;
 
-      face = new Face3( a, d, b );
-      faces.push( face );
-
-      face = new Face3( b, d, c );
-      faces.push( face );
+      faces.push( new Face3( a, d, b ) );
+      faces.push( new Face3( b, d, c ) );
     }
   }
 
@@ -89,6 +85,7 @@ window.WavesTest = function() {
   game.camera.position.set( 0, 3, -8 );
   game.camera.lookAt( 0, 0, 0 );
   game.camera.updateProjectionMatrix();
+
   var controls = new Controls( game.camera );
   controls.target.set( 0, 3, 8 );
   controls.update();
