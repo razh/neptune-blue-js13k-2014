@@ -10,27 +10,27 @@ function Matrix4(
 ) {
   this.elements = new Float32Array( 16 );
 
-  var m = this.elements;
+  var te = this.elements;
 
-  m[  0 ] = ( n11 !== undefined ) ? n11 : 1;
-  m[  4 ] = n12 || 0;
-  m[  8 ] = n13 || 0;
-  m[ 12 ] = n14 || 0;
+  te[  0 ] = ( n11 !== undefined ) ? n11 : 1;
+  te[  4 ] = n12 || 0;
+  te[  8 ] = n13 || 0;
+  te[ 12 ] = n14 || 0;
 
-  m[  1 ] = n21 || 0;
-  m[  5 ] = ( n22 !== undefined ) ? n22 : 1;
-  m[  9 ] = n23 || 0;
-  m[ 13 ] = n24 || 0;
+  te[  1 ] = n21 || 0;
+  te[  5 ] = ( n22 !== undefined ) ? n22 : 1;
+  te[  9 ] = n23 || 0;
+  te[ 13 ] = n24 || 0;
 
-  m[  2 ] = n31 || 0;
-  m[  6 ] = n32 || 0;
-  m[ 10 ] = ( n33 !== undefined ) ? n33 : 1;
-  m[ 14 ] = n34 || 0;
+  te[  2 ] = n31 || 0;
+  te[  6 ] = n32 || 0;
+  te[ 10 ] = ( n33 !== undefined ) ? n33 : 1;
+  te[ 14 ] = n34 || 0;
 
-  m[  3 ] = n41 || 0;
-  m[  7 ] = n42 || 0;
-  m[ 11 ] = n43 || 0;
-  m[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
+  te[  3 ] = n41 || 0;
+  te[  7 ] = n42 || 0;
+  te[ 11 ] = n43 || 0;
+  te[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
 }
 
 Matrix4.prototype.set = function(
@@ -39,27 +39,27 @@ Matrix4.prototype.set = function(
   n31, n32, n33, n34,
   n41, n42, n43, n44
 ) {
-  var m = this.elements;
+  var te = this.elements;
 
-  m[  0 ] = n11;
-  m[  4 ] = n12;
-  m[  8 ] = n13;
-  m[ 12 ] = n14;
+  te[  0 ] = n11;
+  te[  4 ] = n12;
+  te[  8 ] = n13;
+  te[ 12 ] = n14;
 
-  m[  1 ] = n21;
-  m[  5 ] = n22;
-  m[  9 ] = n23;
-  m[ 13 ] = n24;
+  te[  1 ] = n21;
+  te[  5 ] = n22;
+  te[  9 ] = n23;
+  te[ 13 ] = n24;
 
-  m[  2 ] = n31;
-  m[  6 ] = n32;
-  m[ 10 ] = n33;
-  m[ 14 ] = n34;
+  te[  2 ] = n31;
+  te[  6 ] = n32;
+  te[ 10 ] = n33;
+  te[ 14 ] = n34;
 
-  m[  3 ] = n41;
-  m[  7 ] = n42;
-  m[ 11 ] = n43;
-  m[ 15 ] = n44;
+  te[  3 ] = n41;
+  te[  7 ] = n42;
+  te[ 11 ] = n43;
+  te[ 15 ] = n44;
 
   return this;
 };
@@ -81,34 +81,34 @@ Matrix4.prototype.identity = function() {
 };
 
 Matrix4.prototype.setPosition = function( v ) {
-  var m = this.elements;
+  var te = this.elements;
 
-  m[ 12 ] = v.x;
-  m[ 13 ] = v.y;
-  m[ 14 ] = v.z;
+  te[ 12 ] = v.x;
+  te[ 13 ] = v.y;
+  te[ 14 ] = v.z;
 
   return this;
 };
 
 Matrix4.prototype.multiplyScalar = function ( s ) {
-  var m = this.elements;
+  var te = this.elements;
 
-  m[  0 ] *= s;
-  m[  4 ] *= s;
-  m[  8 ] *= s;
-  m[ 12 ] *= s;
-  m[  1 ] *= s;
-  m[  5 ] *= s;
-  m[  9 ] *= s;
-  m[ 13 ] *= s;
-  m[  2 ] *= s;
-  m[  6 ] *= s;
-  m[ 10 ] *= s;
-  m[ 14 ] *= s;
-  m[  3 ] *= s;
-  m[  7 ] *= s;
-  m[ 11 ] *= s;
-  m[ 15 ] *= s;
+  te[  0 ] *= s;
+  te[  4 ] *= s;
+  te[  8 ] *= s;
+  te[ 12 ] *= s;
+  te[  1 ] *= s;
+  te[  5 ] *= s;
+  te[  9 ] *= s;
+  te[ 13 ] *= s;
+  te[  2 ] *= s;
+  te[  6 ] *= s;
+  te[ 10 ] *= s;
+  te[ 14 ] *= s;
+  te[  3 ] *= s;
+  te[  7 ] *= s;
+  te[ 11 ] *= s;
+  te[ 15 ] *= s;
 
   return this;
 };
@@ -154,7 +154,7 @@ Matrix4.prototype.getInverse = function ( m ) {
 Matrix4.prototype.multiplyMatrices = function ( a, b ) {
   var ae = a.elements;
   var be = b.elements;
-  var m = this.elements;
+  var te = this.elements;
 
   var a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[  8 ], a14 = ae[ 12 ];
   var a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[  9 ], a24 = ae[ 13 ];
@@ -166,31 +166,31 @@ Matrix4.prototype.multiplyMatrices = function ( a, b ) {
   var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
   var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
 
-  m[  0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-  m[  4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-  m[  8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-  m[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+  te[  0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+  te[  4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+  te[  8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+  te[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
 
-  m[  1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-  m[  5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-  m[  9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-  m[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+  te[  1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+  te[  5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+  te[  9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+  te[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
 
-  m[  2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-  m[  6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-  m[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-  m[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+  te[  2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+  te[  6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+  te[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+  te[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
 
-  m[  3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-  m[  7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-  m[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-  m[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+  te[  3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+  te[  7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+  te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+  te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
 
   return this;
 };
 
 Matrix4.prototype.makeRotationFromQuaternion = function( q ) {
-  var m = this.elements;
+  var te = this.elements;
 
   var x = q.x, y = q.y, z = q.z, w = q.w;
   var x2 = x + x, y2 = y + y, z2 = z + z;
@@ -198,28 +198,28 @@ Matrix4.prototype.makeRotationFromQuaternion = function( q ) {
   var yy = y * y2, yz = y * z2, zz = z * z2;
   var wx = w * x2, wy = w * y2, wz = w * z2;
 
-  m[ 0 ] = 1 - ( yy + zz );
-  m[ 4 ] = xy - wz;
-  m[ 8 ] = xz + wy;
+  te[ 0 ] = 1 - ( yy + zz );
+  te[ 4 ] = xy - wz;
+  te[ 8 ] = xz + wy;
 
-  m[ 1 ] = xy + wz;
-  m[ 5 ] = 1 - ( xx + zz );
-  m[ 9 ] = yz - wx;
+  te[ 1 ] = xy + wz;
+  te[ 5 ] = 1 - ( xx + zz );
+  te[ 9 ] = yz - wx;
 
-  m[  2 ] = xz - wy;
-  m[  6 ] = yz + wx;
-  m[ 10 ] = 1 - ( xx + yy );
+  te[  2 ] = xz - wy;
+  te[  6 ] = yz + wx;
+  te[ 10 ] = 1 - ( xx + yy );
 
   // last column
-  m[  3 ] = 0;
-  m[  7 ] = 0;
-  m[ 11 ] = 0;
+  te[  3 ] = 0;
+  te[  7 ] = 0;
+  te[ 11 ] = 0;
 
   // bottom row
-  m[ 12 ] = 0;
-  m[ 13 ] = 0;
-  m[ 14 ] = 0;
-  m[ 15 ] = 1;
+  te[ 12 ] = 0;
+  te[ 13 ] = 0;
+  te[ 14 ] = 0;
+  te[ 15 ] = 1;
 
   return this;
 };
@@ -230,7 +230,7 @@ Matrix4.prototype.lookAt = (function() {
       z = new Vector3();
 
   return function( eye, target, up ) {
-    var m = this.elements;
+    var te = this.elements;
 
     z.subVectors( eye, target ).normalize();
 
@@ -247,43 +247,43 @@ Matrix4.prototype.lookAt = (function() {
 
     y.crossVectors( z, x );
 
-    m[  0 ] = x.x;
-    m[  4 ] = y.x;
-    m[  8 ] = z.x;
+    te[  0 ] = x.x;
+    te[  4 ] = y.x;
+    te[  8 ] = z.x;
 
-    m[  1 ] = x.y;
-    m[  5 ] = y.y;
-    m[  9 ] = z.y;
+    te[  1 ] = x.y;
+    te[  5 ] = y.y;
+    te[  9 ] = z.y;
 
-    m[  2 ] = x.z;
-    m[  6 ] = y.z;
-    m[ 10 ] = z.z;
+    te[  2 ] = x.z;
+    te[  6 ] = y.z;
+    te[ 10 ] = z.z;
 
     return this;
   };
 }) ();
 
 Matrix4.prototype.scale = function( v ) {
-  var m = this.elements;
+  var te = this.elements;
 
   var x = v.x,
       y = v.y,
       z = v.z;
 
-  m[  0 ] *= x;
-  m[  1 ] *= x;
-  m[  2 ] *= x;
-  m[  3 ] *= x;
+  te[  0 ] *= x;
+  te[  1 ] *= x;
+  te[  2 ] *= x;
+  te[  3 ] *= x;
 
-  m[  4 ] *= y;
-  m[  5 ] *= y;
-  m[  6 ] *= y;
-  m[  7 ] *= y;
+  te[  4 ] *= y;
+  te[  5 ] *= y;
+  te[  6 ] *= y;
+  te[  7 ] *= y;
 
-  m[  8 ] *= z;
-  m[  9 ] *= z;
-  m[ 10 ] *= z;
-  m[ 11 ] *= z;
+  te[  8 ] *= z;
+  te[  9 ] *= z;
+  te[ 10 ] *= z;
+  te[ 11 ] *= z;
 
   return this;
 };

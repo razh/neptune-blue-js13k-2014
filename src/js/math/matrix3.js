@@ -7,19 +7,19 @@ function Matrix3(
 ) {
   this.elements = new Float32Array( 9 );
 
-  var m = this.elements;
+  var te = this.elements;
 
-  m[ 0 ] = ( n11 !== undefined ) ? n11 : 1;
-  m[ 3 ] = n12 || 0;
-  m[ 6 ] = n13 || 0;
+  te[ 0 ] = ( n11 !== undefined ) ? n11 : 1;
+  te[ 3 ] = n12 || 0;
+  te[ 6 ] = n13 || 0;
 
-  m[ 1 ] = n21;
-  m[ 4 ] = ( n22 !== undefined ) ? n22 : 1;
-  m[ 7 ] = n23 || 0;
+  te[ 1 ] = n21;
+  te[ 4 ] = ( n22 !== undefined ) ? n22 : 1;
+  te[ 7 ] = n23 || 0;
 
-  m[ 2 ] = n31;
-  m[ 5 ] = n32 || 0;
-  m[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
+  te[ 2 ] = n31;
+  te[ 5 ] = n32 || 0;
+  te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
 }
 
 Matrix3.prototype.set = function (
@@ -27,19 +27,19 @@ Matrix3.prototype.set = function (
   n21, n22, n23,
   n31, n32, n33
 ) {
-  var m = this.elements;
+  var te = this.elements;
 
-  m[ 0 ] = n11;
-  m[ 3 ] = n12;
-  m[ 6 ] = n13;
+  te[ 0 ] = n11;
+  te[ 3 ] = n12;
+  te[ 6 ] = n13;
 
-  m[ 1 ] = n21;
-  m[ 4 ] = n22;
-  m[ 7 ] = n23;
+  te[ 1 ] = n21;
+  te[ 4 ] = n22;
+  te[ 7 ] = n23;
 
-  m[ 2 ] = n31;
-  m[ 5 ] = n32;
-  m[ 8 ] = n33;
+  te[ 2 ] = n31;
+  te[ 5 ] = n32;
+  te[ 8 ] = n33;
 
   return this;
 };
@@ -55,19 +55,19 @@ Matrix3.prototype.identity = function() {
 };
 
 Matrix3.prototype.multiplyScalar = function( s ) {
-  var m = this.elements;
+  var te = this.elements;
 
-  m[ 0 ] *= s;
-  m[ 3 ] *= s;
-  m[ 6 ] *= s;
+  te[ 0 ] *= s;
+  te[ 3 ] *= s;
+  te[ 6 ] *= s;
 
-  m[ 1 ] *= s;
-  m[ 4 ] *= s;
-  m[ 7 ] *= s;
+  te[ 1 ] *= s;
+  te[ 4 ] *= s;
+  te[ 7 ] *= s;
 
-  m[ 2 ] *= s;
-  m[ 5 ] *= s;
-  m[ 8 ] *= s;
+  te[ 2 ] *= s;
+  te[ 5 ] *= s;
+  te[ 8 ] *= s;
 
   return this;
 };
