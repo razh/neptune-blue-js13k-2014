@@ -62,6 +62,7 @@ function createPlaneGeometry( width, height, widthSegments, heightSegments ) {
 
 window.WavesTest = function() {
   var game = new Game( 568, 320 );
+  var scene = game.scene;
   document.body.appendChild( game.canvas );
 
   var planeGeometry = createPlaneGeometry( 32, 16, 16, 8 );
@@ -78,7 +79,7 @@ window.WavesTest = function() {
   });
 
   var mesh = new Mesh( planeGeometry, material );
-  game.scene.push( mesh );
+  scene.add( mesh );
 
   game.ambient.setRGB( 0.5, 0.5, 0.5 );
 
@@ -93,7 +94,7 @@ window.WavesTest = function() {
   var light = new DirectionalLight( new Color( 0.6, 0.6, 0.8 ) );
   light.intensity = 2;
   light.position.set( -4, 2, 0 );
-  game.scene.push( light );
+  scene.add( light );
 
   game.scene.fogDensity = 0.1;
 

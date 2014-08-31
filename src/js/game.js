@@ -2,6 +2,7 @@
 'use strict';
 
 var Color = require( './math/color' );
+var Object3D = require( './object3d' );
 var Camera = require( './camera' );
 var Renderer = require( './renderer/renderer' );
 
@@ -19,7 +20,7 @@ function Game( width, height ) {
     height || window.innerHeight
   );
 
-  this.scene = [];
+  this.scene = new Object3D();
   this.ambient = new Color();
 
   this.renderer = new Renderer({
@@ -51,7 +52,7 @@ Game.prototype.update = function() {
 
   dt *= 1e-3;
 
-  this.scene.forEach(function( object ) {
+  this.scene.children.forEach(function( object ) {
     object.update( dt );
   });
 };

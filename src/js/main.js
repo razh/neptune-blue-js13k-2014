@@ -57,21 +57,21 @@ var material = new LambertGlowMaterial({
 });
 
 var mesh = new Mesh( geometry, material );
-scene.push( mesh );
+scene.add( mesh );
 
 game.ambient.setRGB( 0.2, 0.2, 0.2 );
 
 var light = new DirectionalLight( new Color( 1, 0, 0 ) );
 light.position.set( -10, 0, 0 );
-scene.push( light );
+scene.add( light );
 
 var light2 = new DirectionalLight( new Color( 0, 0.4, 0 ) );
 light2.position.set( 0, 10, 0 );
-scene.push( light2 );
+scene.add( light2 );
 
 var light3 = new DirectionalLight( new Color( 0, 0, 0.4 ) );
 light3.position.set( 0, -10, 0 );
-scene.push( light3 );
+scene.add( light3 );
 
 game.ambient.setRGB( 0.5, 0.5, 0.5 );
 

@@ -123,8 +123,8 @@ function Projector() {
 
     var object;
     var i, il;
-    for ( i = 0, il = scene.length; i < il; i++ ) {
-      object = scene[i];
+    for ( i = 0, il = scene.children.length; i < il; i++ ) {
+      object = scene.children[i];
       if ( !object.visible ) {
         continue;
       }
@@ -133,6 +133,7 @@ function Projector() {
 
       if ( object instanceof DirectionalLight ) {
         _renderData.lights.push( object );
+        continue;
       }
 
       _object = getNextObjectInPool();

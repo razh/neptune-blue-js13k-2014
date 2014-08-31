@@ -77,16 +77,16 @@ window.BuildingTest = function() {
   });
 
   var mesh = new Mesh( boxGeometry, material );
-  scene.push( mesh );
+  scene.add( mesh );
 
   var light = new DirectionalLight( new Color( 0.5, 0.5, 0.5 ) );
   light.position.set( -10, 0, 5 );
   light.filter.maskBits = 0;
-  scene.push( light );
+  scene.add( light );
 
   var light2 = new DirectionalLight( new Color( 1, 1, 1 ) );
   light2.position.set( 0, 10, 0 );
-  scene.push( light2 );
+  scene.add( light2 );
 
   game.ambient.setRGB( 0.2, 0.2, 0.2 );
 

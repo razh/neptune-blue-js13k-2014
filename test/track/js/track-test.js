@@ -80,14 +80,12 @@ function createTrackGeometry( radius, length, spacing ) {
     +------------------+  ---
 
  */
-function createTrackMeshes( options ) {
-  options = options || {};
-
-  var count = options.count || 0;
-  var radius = options.radius || 5;
-  var length = options.length || 3;
-  var meshSpacing = options.meshSpacing || 0.5;
-  var spacing = options.spacing || 0.5;
+function createTrackMeshes( count, radius, length, spacing, meshSpacing ) {
+  count = count || 0;
+  radius = radius || 5;
+  length = length || 3;
+  spacing = spacing || 0.5;
+  meshSpacing = meshSpacing || 0.5;
 
   var geometry = createTrackGeometry( radius, length, spacing );
 
@@ -116,13 +114,14 @@ window.TrackTest = function() {
   var game = new Game( 568, 320 );
   document.body.appendChild( game.canvas );
 
-  game.scene = game.scene.concat(createTrackMeshes({
-    count: 5
-  }));
+  var meshes = createTrackMeshes( 5 );
+  for ( var i = 0, il = meshes.length; i < il; i++ ) {
+    game.scene.add( meshes[i] );
+  }
 
   game.camera.position.set( 0, 2, -4 );
 
-  var lastMesh = game.scene[ game.scene.length - 1 ];
+  var lastMesh = meshes[ meshes.length - 1 ];
   var controls = new Controls( game.camera );
   var target = new Vector3().copy( lastMesh.position );
   target.y = 2;

@@ -165,6 +165,7 @@ document.addEventListener( 'touchend',   function() { movement = false; });
 
 window.ShipTest = function() {
   var game = new Game( 568, 320 );
+  var scene = game.scene;
   document.body.appendChild( game.canvas );
 
   var shipGeometry = createShipGeometry();
@@ -178,7 +179,7 @@ window.ShipTest = function() {
   });
 
   var mesh = new Mesh( shipGeometry, material );
-  game.scene.push( mesh );
+  scene.add( mesh );
 
   game.ambient.setRGB( 0.4, 0.4, 0.4 );
 
@@ -190,7 +191,7 @@ window.ShipTest = function() {
 
   var light = new DirectionalLight( new Color( 1, 1, 1 ) );
   light.position.set( -5, 10, 0 );
-  game.scene.push( light );
+  scene.add( light );
 
   var time = 0;
   var prev = 0;
