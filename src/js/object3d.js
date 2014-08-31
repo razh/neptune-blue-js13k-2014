@@ -11,6 +11,8 @@ var qt = new Quaternion();
 var mt = new Matrix4();
 
 function Object3D() {
+  this.children = [];
+
   this.position = new Vector3();
   this.quaternion = new Quaternion();
   this.scale = new Vector3( 1, 1, 1 );
@@ -20,6 +22,20 @@ function Object3D() {
 
   this.visible = true;
 }
+
+Object3D.prototype.add = function( object ) {
+  this.children.push( object );
+  return this;
+};
+
+Object3D.prototype.remove = function( object ) {
+  var index = this.children.indexOf( object );
+  if ( index > -1 ) {
+    this.children.splice( index, 1 );
+  }
+
+  return this;
+};
 
 Object3D.prototype.update = function() {};
 
