@@ -15,10 +15,7 @@ function Game( width, height ) {
   this.t = 0;
 
   this.camera = new Camera( 90 );
-  this.setSize(
-    width  || window.innerWidth,
-    height || window.innerHeight
-  );
+  this.setSize( width, height );
 
   this.scene = new Object3D();
   this.ambient = new Color();

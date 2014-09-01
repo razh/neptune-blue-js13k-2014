@@ -13,6 +13,13 @@
     }
 
     body {
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* Center children. */
+    .c {
       display: -webkit-flex;
       display: flex;
 
@@ -21,18 +28,58 @@
 
       -webkit-justify-content: center;
       justify-content: center;
+    }
 
-      margin: 0;
-      background: #000;
-      overflow: hidden;
+    /* Container. */
+    #g {
+      position: relative;
+      outline: 1px solid #222;
+    }
+
+    /* Menu. */
+    #m {
+      position: absolute;
+      z-index: 1;
+
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Hidden class. */
+    .h {
+      display: none;
+    }
+
+    /* Play button. */
+    #p {
+      background: none;
+      padding: 0.3em 1em;
+
+      color: #fff;
+      font: 2em Futura, sans-serif;
+      letter-spacing: 0.2em;
+
+      outline: 0;
+      border: 0.1em solid;
+    }
+
+    #p:active {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
     }
 
     canvas {
-      outline: 1px solid #222;
+      display: block;
     }
   </style>
 </head>
-<body>
+<body class='c'>
+  <div id='g'></div>
 
   <script src="./js/bundle.js"></script>
 </body>
