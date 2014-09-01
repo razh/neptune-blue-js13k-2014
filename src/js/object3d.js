@@ -4,6 +4,9 @@ var Vector3 = require( './math/vector3' );
 var Matrix4 = require( './math/matrix4' );
 var Quaternion = require( './math/quaternion' );
 
+// Temp Vector3.
+var vt = new Vector3();
+
 // Temp Quaternion.
 var qt = new Quaternion();
 
@@ -65,6 +68,24 @@ Object3D.prototype.rotateY = function( angle ) {
 
 Object3D.prototype.rotateZ = function( angle ) {
   return this.rotateOnAxis( Vector3.Z, angle );
+};
+
+Object3D.prototype.translateOnAxis = function( axis, distance ) {
+  vt.copy( axis ).applyQuaternion( this.quaternion );
+  this.position.add( vt.multiplyScalar( distance ) );
+  return this;
+};
+
+Object3D.prototype.translateX = function( distance ) {
+  return this.translateOnAxis( Vector3.X, distance );
+};
+
+Object3D.prototype.translateY = function( distance ) {
+  return this.translateOnAxis( Vector3.Y, distance );
+};
+
+Object3D.prototype.translateZ = function( distance ) {
+  return this.translateOnAxis( Vector3.Z, distance );
 };
 
 Object3D.prototype.lookAt = function( vector ) {
