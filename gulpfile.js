@@ -39,10 +39,6 @@ commander
 
 var production = !!commander.production;
 
-function onError(error) {
-  util.log(chalk.red('Error:'), chalk.gray(error.message));
-}
-
 gulp.task('browser-sync', function() {
   browserSync({
     server: {
@@ -59,7 +55,10 @@ gulp.task('js', function() {
 
   return bundler
     .bundle()
-    .on('error', onError)
+    .on('error', function onError(error) {
+      util.log(chalk.red('Error:'), chalk.gray(error.message));
+      this.emit('end');
+    })
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(gulpif(production, uglify()))

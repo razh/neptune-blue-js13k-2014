@@ -23,7 +23,10 @@ gulp.task('browser-sync', function() {
 gulp.task('js', function() {
   return browserify('./main.js', {debug: true})
     .bundle()
-    .on('error', util.log)
+    .on('error', function(error) {
+      util.log(error.message);
+      this.emit('end');
+    })
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(gulp.dest('dist/js'));
