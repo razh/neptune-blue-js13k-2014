@@ -95,6 +95,7 @@ var substitutions = {
   'op': 'opacity',
   'bl': 'blending',
   'bh': 'batch',
+  'ov': 'overdraw',
   // Material sides.
   '.DS': '.DoubleSide',
   '.FS': '.FrontSide',

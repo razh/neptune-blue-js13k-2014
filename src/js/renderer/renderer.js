@@ -90,7 +90,7 @@ function Renderer( options ) {
 
     _fogDensity = scene.fogDensity;
 
-    var element, material, prevMaterial;
+    var element, material, prevMaterial, overdraw;
     var isQuad;
     for ( var e = 0, el = _elements.length; e < el; e++ ) {
       element = _elements[e];
@@ -146,6 +146,13 @@ function Renderer( options ) {
         _v1.positionScreen.y *= _canvasHeightHalf;
         _v2.positionScreen.x *= _canvasWidthHalf;
         _v2.positionScreen.y *= _canvasHeightHalf;
+
+        overdraw = material.overdraw;
+        if ( overdraw ) {
+          expand( _v0.positionScreen, _v1.positionScreen, overdraw );
+          expand( _v1.positionScreen, _v2.positionScreen, overdraw );
+          expand( _v2.positionScreen, _v0.positionScreen, overdraw );
+        }
 
         if ( isQuad ) {
           _v3.positionScreen.x *= _canvasWidthHalf;
@@ -286,6 +293,28 @@ function Renderer( options ) {
     _ctx.lineTo( x2, y2 );
     _ctx.lineTo( x3, y3 );
     _ctx.lineTo( x0, y0 );
+  }
+
+  function expand( v0, v1, pixels ) {
+    var x = v1.x - v0.x,
+        y = v1.y - v0.y;
+
+    var det = x * x + y * y,
+        idet;
+
+    if ( !det ) {
+      return;
+    }
+
+    idet = pixels / Math.sqrt( det );
+
+    x *= idet;
+    y *= idet;
+
+    v0.x -= x;
+    v0.y -= y;
+    v1.x += x;
+    v1.y += y;
   }
 }
 

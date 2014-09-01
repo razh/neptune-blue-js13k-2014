@@ -25,6 +25,7 @@ function Material( options ) {
   this.shadowBlur = options.shadowBlur || 0;
 
   this.blending = options.blending || 'source-over';
+  this.overdraw = options.overdraw || 0;
 }
 
 Material.prototype.set = function( ctx ) {
