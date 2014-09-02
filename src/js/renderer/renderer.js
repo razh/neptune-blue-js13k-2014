@@ -45,7 +45,8 @@ function Renderer( options ) {
   _fogDensity,
 
   _vector3 = new Vector3(),
-  _centroid = new Vector3();
+  _centroid = new Vector3(),
+  _lightPosition = new Vector3();
 
   if ( !_ctx ) {
     return;
@@ -150,19 +151,19 @@ function Renderer( options ) {
     var normal = element.normalModel;
     // Cumulative blur intensity of directional lights.
     var intensity = 0;
-    var light, lightPosition, isPointLight;
+    var light, isPointLight;
     var amount;
     for ( var l = 0, ll = _lights.length; l < ll; l++ ) {
       light = _lights[l];
-      _lightColor.copy( light.color );
 
-      lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
+      _lightColor.copy( light.color );
+      _lightPosition.setFromMatrixPosition( light.matrixWorld );
 
       isPointLight = light instanceof PointLight;
       if ( isPointLight ) {
-        amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+        amount = normal.dot( _vector3.subVectors( _lightPosition, position ).normalize() );
       } else {
-        amount = normal.dot( lightPosition.normalize() );
+        amount = normal.dot( _lightPosition.normalize() );
       }
 
       if ( amount <= 0 ) {
@@ -171,7 +172,7 @@ function Renderer( options ) {
 
       if ( isPointLight ) {
         amount *= light.distance ?
-          1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 )
+          1 - Math.min( position.distanceTo( _lightPosition ) / light.distance, 1 )
           : 1;
 
         if ( !amount ) {
