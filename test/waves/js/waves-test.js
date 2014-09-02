@@ -73,22 +73,25 @@ window.WavesTest = function() {
     ambient: new Color( 0.3, 0.3, 0.3 ),
     wireframe: true,
     lineWidth: 1,
-    shadowColor: new Color( 0.5, 0.5, 1 ),
-    blur: 50,
     opacity: 0.5
   });
 
   var mesh = new Mesh( planeGeometry, material );
   scene.add( mesh );
 
+  var mesh2 = new Mesh( planeGeometry, material );
+  mesh2.position.z = 16;
+  mesh2.position.x = -4;
+  scene.add( mesh2 );
+
   game.ambient.setRGB( 0.5, 0.5, 0.5 );
 
-  game.camera.position.set( 0, 3, -8 );
+  game.camera.position.set( 0, 4, -8 );
   game.camera.lookAt( 0, 0, 0 );
   game.camera.updateProjectionMatrix();
 
   var controls = new Controls( game.camera );
-  controls.target.set( 0, 3, 8 );
+  controls.target.set( 0, 4, 24 );
   controls.update();
 
   var light = new DirectionalLight( new Color( 0.6, 0.6, 0.8 ) );
