@@ -90,7 +90,7 @@ function Renderer( options ) {
 
     _fogDensity = scene.fogDensity;
 
-    var element, material, prevMaterial, overdraw;
+    var element, material, overdraw;
     var isQuad;
     for ( var e = 0, el = _elements.length; e < el; e++ ) {
       element = _elements[e];
@@ -99,23 +99,6 @@ function Renderer( options ) {
       if ( !material || !material.opacity ) {
         continue;
       }
-
-      if ( material !== prevMaterial ) {
-        // End batch drawing.
-        if ( prevMaterial && prevMaterial.batch ) {
-          prevMaterial.draw( _ctx );
-        }
-
-        // Set basic properties.
-        material.set( _ctx );
-
-        // Start batch drawing.
-        if ( material.batch ) {
-          _ctx.beginPath();
-        }
-      }
-
-      prevMaterial = material;
 
       if ( element instanceof RenderableFace ) {
         isQuad = element instanceof RenderableQuad;
@@ -133,11 +116,6 @@ function Renderer( options ) {
         if ( isQuad &&
              ( -1 > _v3.positionScreen.z || _v3.positionScreen.z > 1 ) ) {
           continue;
-        }
-
-        // Start non-batch individal element drawing.
-        if ( !material.batch ) {
-          _ctx.beginPath();
         }
 
         _v0.positionScreen.x *= _canvasWidthHalf;
@@ -163,11 +141,6 @@ function Renderer( options ) {
           renderFace( element, material, isQuad, _v0, _v1, _v2 );
         }
       }
-    }
-
-    // End batch drawing for last element(s).
-    if ( prevMaterial && prevMaterial.batch ) {
-      prevMaterial.draw( _ctx );
     }
 
     _ctx.restore();
@@ -222,6 +195,10 @@ function Renderer( options ) {
   function renderFace( element, material, isQuad, v0, v1, v2, v3 ) {
     _this.info.render.vertices += isQuad ? 4 : 3;
 
+    // Set basic properties.
+    material.set( _ctx );
+    _ctx.beginPath();
+
     _v0x = v0.positionScreen.x;
     _v0y = v0.positionScreen.y;
     _v1x = v1.positionScreen.x;
@@ -241,42 +218,40 @@ function Renderer( options ) {
     }
 
     var fogAlpha = 1;
-    if ( !material.batch ) {
-      // Compute fogAlpha.
-      if ( _fogDensity ) {
-        var w = v0.positionScreen.w + v1.positionScreen.w + v2.positionScreen.w;
-        w = isQuad ? ( ( w + v3.positionScreen.w ) / 4 ) : w / 3;
-        // w here is clip.w, where gl_FragCoord.w = 1 / clip.w.
-        var depth = element.z * w;
+    // Compute fogAlpha.
+    if ( _fogDensity ) {
+      var w = v0.positionScreen.w + v1.positionScreen.w + v2.positionScreen.w;
+      w = isQuad ? ( ( w + v3.positionScreen.w ) / 4 ) : w / 3;
+      // w here is clip.w, where gl_FragCoord.w = 1 / clip.w.
+      var depth = element.z * w;
 
-        fogAlpha = Utils.clamp(
-          Math.pow( 2, -_fogDensity * _fogDensity * depth * depth / Math.LN2 ),
-          0, 1
-        );
-      }
+      fogAlpha = Utils.clamp(
+        Math.pow( 2, -_fogDensity * _fogDensity * depth * depth / Math.LN2 ),
+        0, 1
+      );
+    }
 
-      if ( material instanceof LambertMaterial ) {
-        _diffuseColor.copy( material.color );
-        _emissiveColor.copy( material.emissive );
-        _color.copy( _ambientLight );
+    if ( material instanceof LambertMaterial ) {
+      _diffuseColor.copy( material.color );
+      _emissiveColor.copy( material.emissive );
+      _color.copy( _ambientLight );
 
-        _centroid.copy( v0.positionWorld )
-          .add( v1.positionWorld )
-          .add( v2.positionWorld );
+      _centroid.copy( v0.positionWorld )
+        .add( v1.positionWorld )
+        .add( v2.positionWorld );
 
-        if ( isQuad ) {
-          _centroid.add( v3.positionWorld ).multiplyScalar( 1 / 4 );
-        } else {
-          _centroid.multiplyScalar( 1 / 3 );
-        }
-
-        _intensity = calculateLight( element, _centroid, material, _color );
-
-        _color.multiply( _diffuseColor ).add( _emissiveColor );
-        material.draw( _ctx, _color, fogAlpha, _intensity );
+      if ( isQuad ) {
+        _centroid.add( v3.positionWorld ).multiplyScalar( 1 / 4 );
       } else {
-        material.draw( _ctx, fogAlpha );
+        _centroid.multiplyScalar( 1 / 3 );
       }
+
+      _intensity = calculateLight( element, _centroid, material, _color );
+
+      _color.multiply( _diffuseColor ).add( _emissiveColor );
+      material.draw( _ctx, _color, fogAlpha, _intensity );
+    } else {
+      material.draw( _ctx, fogAlpha );
     }
   }
 

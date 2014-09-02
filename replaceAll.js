@@ -94,7 +94,6 @@ var substitutions = {
   'wf': 'wireframe',
   'op': 'opacity',
   'bl': 'blending',
-  'bh': 'batch',
   'ov': 'overdraw',
   // Material sides.
   '.DS': '.DoubleSide',

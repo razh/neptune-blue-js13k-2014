@@ -9,7 +9,6 @@ var FrontSide  = 0,
 function Material( options ) {
   options = options || {};
 
-  this.batch = ( options.batch !== undefined ) ? options.batch : true;
   this.side = options.side || FrontSide;
 
   this.color = options.color || new Color();
@@ -46,7 +45,7 @@ Material.prototype.set = function( ctx ) {
 };
 
 Material.prototype.draw = function( ctx, alpha ) {
-  if ( !this.batch && alpha !== undefined ) {
+  if ( alpha !== undefined ) {
     ctx.globalAlpha = this.opacity * alpha;
   }
 

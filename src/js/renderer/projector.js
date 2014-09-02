@@ -22,8 +22,6 @@ function Projector() {
   _quadCount = 0, _quadPool = [],
 
   _renderData = { objects: [], lights: [], elements: [] },
-  // Custom variable for per-object face z-sorting.
-  _elements = [],
 
   _vector3 = new Vector3(),
 
@@ -176,8 +174,6 @@ function Projector() {
       _normalMatrix.getNormalMatrix( _modelMatrix );
       side = material.side;
 
-      _elements.length = 0;
-
       for ( v = 0, vl = vertices.length; v < vl; v++ ) {
         vertex = vertices[v];
         renderList.pushVertex( vertex.x, vertex.y, vertex.z );
@@ -244,18 +240,12 @@ function Projector() {
           ) / 3;
         }
 
-        _elements.push( _face );
-      }
-
-      _elements.sort( painterSort );
-
-      for ( f = 0, fl = _elements.length; f < fl; f++ ) {
-        _renderData.elements.push( _elements[f] );
+        _renderData.elements.push( _face );
       }
     }
 
-    // We do not sort render elements since they might be batched in the
-    // canvas renderer.
+    _renderData.elements.sort( painterSort );
+
     return _renderData;
   };
 
