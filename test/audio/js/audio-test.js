@@ -19,14 +19,14 @@ window.AudioTest = function() {
     '\x01\x00' +
     '\x01\x00' +
     '\x44\xAC\x00\x00' +
-    '\x44\xAC\x00\x00' +
-    '\x01\x00' +
-    '\x08\x00' +
+    '\x88\x58\x01\x00' +
+    '\x02\x00' +
+    '\x10\x00' +
     'data' +
-    '\x11\x2B'
+    '\x22\x56'
   );
 
-  var prefix = 'data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEARKwAAESsAAABAAgAZGF0YREr';
+  var prefix = 'data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSJW';
 
   var A4 = 69;
   var A2 = 45;
@@ -70,7 +70,9 @@ window.AudioTest = function() {
     for ( var i = 0; i < length; i++ ) {
       sample = freq * i / 44100;
       wave = fn( sample, i / length );
-      sound += String.fromCharCode( wave * 127 + 128 );
+      wave *= 32767;
+      sound += String.fromCharCode( wave & 0xFF );
+      sound += String.fromCharCode( ( wave >> 8 ) & 0xFF );
     }
 
     return sound;
@@ -95,10 +97,10 @@ window.AudioTest = function() {
   }
 
   function square( sample ) {
-    return sample < 0.5 ? 1 : -1;
+    return ( sample % 1 ) < 0.5 ? 1 : -1;
   }
 
-  var kick = waveformFn( 0.05, 32 );
+  var kick = waveformFn( 0.1, 32 );
   var snare = waveformFn( 0.8, 16 );
 
   function hat( sample, time ) {
@@ -141,10 +143,10 @@ window.AudioTest = function() {
   var snarenote2 = build( E3, snare, 0.25, 0.2 );
   var snarenote2a = build( E3, snare, 0.25, 0.2 );
   var snarenote3 = build( E3, snare, 0.3, 0.6 );
-  var kicknote = build( E2, kick, 0.5, 0.8 );
+  var kicknote = build( E1, kick, 0.5, 0.8 );
   var bkicknote = build( B1, kick, 0.5, 0.8 );
-  var kicknote2 = build( E2, kick, 0.5, 0.6 );
-  var kicknote3 = build( E2, kick, 0.5, 0.6 );
+  var kicknote2 = build( E1, kick, 0.5, 0.6 );
+  var kicknote3 = build( E1, kick, 0.5, 0.6 );
   var b1amb = build( B1, ambience, 1, 0.1 );
   var e2amb = build( E2, ambience, 1, 0.1 );
   var a1amb = build( A1, ambience, 1, 0.1 );
@@ -244,7 +246,7 @@ window.AudioTest = function() {
   function playAll3() {
     if ( bar % 2 < 1 ) {
       playOn( kicknote, 0 );
-      if ( bar % 16 > 8 ) {
+      if ( bar % 16 >= 12 ) {
         playOn( kicknote3, 0.375 * NOTE );
       }
 
