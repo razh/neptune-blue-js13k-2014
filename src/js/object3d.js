@@ -2,6 +2,7 @@
 
 var Vector3 = require( './math/vector3' );
 var Matrix4 = require( './math/matrix4' );
+var Euler = require( './math/euler' );
 var Quaternion = require( './math/quaternion' );
 
 // Temp Vector3.
@@ -17,6 +18,7 @@ function Object3D() {
   this.children = [];
 
   this.position = new Vector3();
+  this.rotation = new Euler();
   this.quaternion = new Quaternion();
   this.scale = new Vector3( 1, 1, 1 );
 
@@ -48,6 +50,14 @@ Object3D.prototype.updateMatrix = function() {
   this.matrix.setPosition( this.position );
   this.matrixWorld.copy( this.matrix );
   return this;
+};
+
+Object3D.prototype.updateQuaternion = function() {
+  this.quaternion.setFromEuler( this.rotation );
+};
+
+Object3D.prototype.updateRotation = function() {
+  this.rotation.setFromQuaternion( this.quaternion );
 };
 
 Object3D.prototype.rotateOnAxis = function ( axis, angle ) {

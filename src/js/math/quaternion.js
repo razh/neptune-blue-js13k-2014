@@ -92,4 +92,25 @@ Quaternion.prototype.setFromRotationMatrix = function ( m ) {
   return this;
 };
 
+// Assume a default order of 'XYZ'.
+Quaternion.prototype.setFromEuler = function( euler ) {
+  // http://www.mathworks.com/matlabcentral/fileexchange/
+  //  20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
+  //  content/SpinCalc.m
+
+  var c1 = Math.cos( euler.x / 2 );
+  var c2 = Math.cos( euler.y / 2 );
+  var c3 = Math.cos( euler.z / 2 );
+  var s1 = Math.sin( euler.x / 2 );
+  var s2 = Math.sin( euler.y / 2 );
+  var s3 = Math.sin( euler.z / 2 );
+
+  this.x = s1 * c2 * c3 + c1 * s2 * s3;
+  this.y = c1 * s2 * c3 - s1 * c2 * s3;
+  this.z = c1 * c2 * s3 + s1 * s2 * c3;
+  this.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+  return this;
+};
+
 module.exports = Quaternion;
