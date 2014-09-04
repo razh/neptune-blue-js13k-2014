@@ -11,6 +11,9 @@ var DirectionalLight = require( '../../../src/js/lights/directional-light' );
 
 var Controls = require( '../../main/controls' );
 
+var DEG_TO_RAD = Math.PI / 180;
+var HALF_PI = Math.PI / 2;
+
 function addFuselageGeometry( geometry, forward, aft, width, height ) {
   forward = forward || 3;
   aft = aft || 1;
@@ -101,10 +104,10 @@ function addWingGeometry( geometry, offsetX, width, height, length, shear, forwa
 function createShipGeometry() {
   var geometry = new Geometry();
 
-  var fuselageForward = 4;
-  var fuselageAft = 1;
+  var fuselageForward = 3;
+  var fuselageAft = 0.8;
   var fuselageWidth = 0.8;
-  var fuselageHeight = 0.8;
+  var fuselageHeight = 0.6;
 
   // Body.
   addFuselageGeometry(
@@ -113,7 +116,7 @@ function createShipGeometry() {
     fuselageWidth, fuselageHeight
   );
 
-  var wingOffsetX = 0.7;
+  var wingOffsetX = 0.8;
   var wingWidth = 0.8;
   var wingHeight = 0.2;
   var wingLength = 1.2;
@@ -147,21 +150,17 @@ function createShipGeometry() {
   return geometry;
 }
 
-var movement = false;
+var keys = [];
 document.addEventListener( 'keydown', function( event ) {
-  if ( event.which === 32 ) {
-    movement = true;
-  }
+  keys[ event.which ] = true;
 });
 
 document.addEventListener( 'keyup', function( event ) {
-  if ( event.which === 32 ) {
-    movement = false;
-  }
+  keys[ event.which ] = false;
 });
 
-document.addEventListener( 'touchstart', function() { movement = true;  });
-document.addEventListener( 'touchend',   function() { movement = false; });
+document.addEventListener( 'touchstart', function() { keys[ 32 ] = true;  });
+document.addEventListener( 'touchend',   function() { keys[ 32 ] = false; });
 
 window.ShipTest = function() {
   var game = new Game( 568, 320 );
@@ -183,33 +182,62 @@ window.ShipTest = function() {
 
   game.ambient.setRGB( 0.4, 0.4, 0.4 );
 
-  game.camera.position.set( 0, 1.8, -5 );
-  game.camera.lookAt( 0, 0, 0 );
-  game.camera.fov = 60;
-  game.camera.updateProjectionMatrix();
+  game.camera.position.set( 0, 4, -6 );
   var controls = new Controls( game.camera );
+  controls.target.set( 0, 3, 8 );
+  controls.update();
 
   var light = new DirectionalLight( new Color( 1, 1, 1 ) );
   light.position.set( -5, 10, 0 );
   scene.add( light );
 
+  var speed = 24;
+  var limit = 6;
+  var turnRate = 180 * DEG_TO_RAD;
+
   var time = 0;
   var prev = 0;
   var rotateZ = 0;
   mesh.update = function( dt ) {
-    if ( !movement ) {
+    // Space.
+    if ( keys[ 32 ] ) {
+      // Undo previous rotation.
+      mesh.rotateZ( -prev );
+
+      time += dt;
+      rotateZ = Math.sin( time );
+      mesh.rotateZ( rotateZ );
+      prev = rotateZ;
+
+      mesh.position.x = 4 * Math.sin( time );
       return;
     }
 
-    // Undo previous rotation.
-    mesh.rotateZ( -prev );
+    var position = mesh.position;
+    var rotation = mesh.rotation;
+    // Right arrow. D.
+    if ( keys[ 39 ] || keys[ 68 ] ) {
+      if ( position.x > -limit ) {
+        position.x -= speed * dt;
+        rotation.z = Math.max( rotation.z - turnRate * dt, -HALF_PI );
+      }
+    }
 
-    time += dt;
-    rotateZ = Math.sin( time );
-    mesh.rotateZ( rotateZ );
-    prev = rotateZ;
+    // Left arrow. A.
+    if ( keys[ 37 ] || keys[ 65 ] ) {
+      if ( position.x < limit ) {
+        position.x += speed * dt;
+        rotation.z = Math.min( rotation.z + turnRate * dt, HALF_PI );
+      }
+    }
 
-    mesh.position.x = 3 * Math.sin( time );
+    rotation.z -= 4 * rotation.z * dt;
+
+    if ( Math.abs( rotation.z ) < 1e-2 ) {
+      rotation.z = 0;
+    }
+
+    mesh.updateQuaternion();
   };
 
   game.play();
