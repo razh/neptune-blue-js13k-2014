@@ -2,6 +2,9 @@
 
 var Vector3 = require( './vector3' );
 
+// Temp Vector3.
+var vt = new Vector3();
+
 function Box3( min, max ) {
   this.min = min || new Vector3(  Infinity,  Infinity,  Infinity );
   this.max = max || new Vector3( -Infinity, -Infinity, -Infinity );
@@ -38,6 +41,21 @@ Box3.prototype.setFromPoints = function( points ) {
 
   for ( var i = 0, il = points.length; i < il; i++ ) {
     this.expandByPoint( points[i] );
+  }
+
+  return this;
+};
+
+// Assumes that the object world matrix has been updated.
+Box3.prototype.setFromObject = function( object ) {
+  this.makeEmpty();
+
+  var vertices = object.geometry.vertices;
+  for ( var i = 0, il = vertices.length; i < il; i++ ) {
+    vt.copy( vertices[i] )
+      .applyMatrix4( object.matrixWorld );
+
+    this.expandByPoint( vt );
   }
 
   return this;
