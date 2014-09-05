@@ -13,8 +13,6 @@ var cb = new Vector3(),
 function Geometry() {
   this.vertices = [];
   this.faces = [];
-
-  this.boundingBox = null;
 }
 
 /**
@@ -91,14 +89,6 @@ Geometry.prototype.computeFaceNormals = function() {
     cb.cross( ab ).normalize();
     face.normal.copy( cb );
   }
-};
-
-Geometry.prototype.computeBoundingBox = function() {
-  if ( !this.boundingBox ) {
-    this.boundingBox = new Box3();
-  }
-
-  this.boundingBox.setFromPoints( this.vertices );
 };
 
 module.exports = Geometry;

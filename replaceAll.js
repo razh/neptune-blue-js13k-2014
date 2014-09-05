@@ -67,10 +67,9 @@ var substitutions = {
   'pV': 'pushVertex',
   // Bounding box.
   '.sFP': '.setFromPoints',
+  '.sFO': '.setFromObject',
   '.eP': '.expandByPoint',
   '.iB': '.isIntersectionBox',
-  '.bB': '.boundingBox',
-  '.cBB': '.computeBoundingBox',
   '.mE': '.makeEmpty',
   '.vi': '.visible',
   '.ve': '.vertices',
