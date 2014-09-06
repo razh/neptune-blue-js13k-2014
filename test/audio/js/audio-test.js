@@ -79,11 +79,42 @@ window.AudioTest = function() {
     return sound;
   }
 
+  // Based off of dsp.js.
+  function adsrFn( attack, decay, sustain, release, sustainLevel ) {
+    decay += attack;
+    sustain += decay;
+    release += sustain;
+    console.log( attack, decay, sustain, release );
+
+    return function adsr( time ) {
+      var amplitude = 0;
+
+      if ( time <= attack ) {
+        amplitude = time / attack;
+      } else if ( time <= decay ) {
+        amplitude = 1 + ( sustainLevel - 1 ) * ( time - attack ) / ( decay - attack );
+      } else if ( time <= sustain ) {
+        amplitude = sustainLevel;
+      } else if ( time <= release ) {
+        amplitude = sustainLevel * ( 1 - ( time - sustain ) / ( release - sustain ) );
+      }
+
+      return amplitude;
+    };
+  }
+
   function waveformFn( noise, decay ) {
     return function waveform( sample, time ) {
-      var wave = _.clamp( sine( sample ) - _.randFloatSpread( noise ), -1, 1 );
+      var wave = _.clamp( sine( sample ) + _.randFloatSpread( noise ), -1, 1 );
       var env = Math.exp( -time * decay );
       return wave * env;
+    };
+  }
+
+  function waveformADSRFn( noise, adsr ) {
+    return function waveformADSR( sample, time ) {
+      var wave = _.clamp( sine( sample ) + _.randFloatSpread( noise ), -1, 1 );
+      return wave * adsr( time );
     };
   }
 
@@ -107,6 +138,8 @@ window.AudioTest = function() {
 
   var kick = waveformFn( 0.1, 32 );
   var snare = waveformFn( 0.8, 16 );
+
+  var kickADSR = waveformADSRFn( 0, adsrFn( 0.01, 0.1, 0.1, 0.1, 0.2 ) );
 
   function hat( sample, time ) {
     var wave = _.clamp( sine( sample ) + _.randFloatSpread( 1.2 ), -1, 1 );
@@ -230,6 +263,8 @@ window.AudioTest = function() {
   var cs4bass2 = build( CS4, bass, 0.4, 0.2 );
   var cs3bass3 = build( CS3, bass, 0.5, 0.2 );
 
+  var kicknoteADSR = build( E3, kickADSR, 1, 0.5 );
+
   function playOn( sound, delay ) {
     setTimeout(function() {
       play( sound );
@@ -238,13 +273,14 @@ window.AudioTest = function() {
 
   var BPM = 140;
   var NOTE = 2 * 60 / BPM * 1000;
-  play( kicknote );
+  play( kicknote, 500 );
   // playOn( snarenote, 800 );
   // playOn( e4note, 0.75 * NOTE );
 
   // playOn( e4hat, 1000 );
-  playOn( e3bass, 1000 );
-  playOn( e3note, 1500 );
+  playOn( e3bass, 1500 );
+  playOn( e3note, 2000 );
+  playOn( kicknoteADSR, 1000 );
 
 
   var bar = 0;
