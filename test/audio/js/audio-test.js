@@ -450,4 +450,58 @@ window.AudioTest = function() {
       start();
     }
   });
+
+
+  // Plotting waveform.
+  function rescale( x, a, b, c, d ) {
+    return _.lerp( c, d, _.inverseLerp( a, b, x ) );
+  }
+
+  var canvas = document.createElement( 'canvas' ),
+      context = canvas.getContext( '2d' );
+
+  canvas.width = 640;
+  canvas.height = 256;
+
+  document.body.appendChild( canvas );
+
+  function plot( ctx, fn, freq, duration ) {
+    var width = ctx.canvas.width,
+        height = ctx.canvas.height;
+
+    var min = Infinity,
+        max = -Infinity;
+
+    var length = duration * rate;
+    var data = new Array( length );
+    var value;
+    var i;
+    for ( i = 0; i < length; i++ ) {
+      value = fn( freq * i / rate, i / length );
+
+      if ( value < min ) { min = value; }
+      if ( value > max ) { max = value; }
+
+      data[i] = value;
+    }
+
+    ctx.clearRect( 0, 0, width, height );
+    ctx.beginPath();
+
+    var size = 0.5,
+        halfSize = size / 2;
+
+    var x, y;
+    for ( i = 0; i < length; i++ ) {
+      x = width * i / length;
+      y = rescale( data[i], min, max, 0, height );
+      ctx.rect( x - halfSize, y - halfSize, size, size );
+    }
+
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+  }
+
+  plot( context, kickADSR, toFreq( A4 ), 0.2 );
+
 };
