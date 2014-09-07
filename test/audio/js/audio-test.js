@@ -1,3 +1,4 @@
+/*jshint bitwise:false*/
 /*globals requestAnimationFrame*/
 'use strict';
 
@@ -21,12 +22,10 @@ window.AudioTest = function() {
     '\x44\xAC\x00\x00' +
     '\x88\x58\x01\x00' +
     '\x02\x00' +
-    '\x10\x00' +
-    'data' +
-    '\x22\x56'
+    '\x10\x00'
   );
 
-  var prefix = 'data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSJW';
+  var prefix = 'data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAA';
 
   var A1 = 33;
   var A2 = 45;
@@ -44,12 +43,24 @@ window.AudioTest = function() {
   var E3 = 52;
   var E4 = 64;
 
+  // Convert big-endian 32-bit (8-byte) number to little-endian string for
+  // PCM headers.
+  function dataLength( n ) {
+    return String.fromCharCode.apply( null, [
+      n & 0xFF,
+      ( n >> 8 ) & 0xFF,
+      ( n >> 16 ) & 0xFF,
+      ( n >> 24 ) & 0xFF
+    ]);
+  }
+
   function toFreq( note ) {
     return Math.pow( 2, ( note - A4 ) / 12 ) * 440;
   }
 
   function create( data, volume ) {
-    var audio = new Audio( prefix + btoa( data ) );
+    // Add 'data' prefix.
+    var audio = new Audio( prefix + btoa( 'data' + dataLength( data ) + data ) );
     audio.volume = volume;
     return audio;
   }
@@ -119,8 +130,8 @@ window.AudioTest = function() {
   }
 
   function bell( sample, time ) {
-    var wave = _.lerp( square( sample ), sine( sample ), 0.4 );
-    var env = Math.exp( -time * 2 );
+    var wave = _.lerp( square( sample ), sine( sample ), 0.7 );
+    var env = Math.exp( -time * 4 );
     if ( time > 0.5 ) {
       env *= 2 - 2 * time;
     }
@@ -139,7 +150,7 @@ window.AudioTest = function() {
   var kick = waveformFn( 0.1, 32 );
   var snare = waveformFn( 0.8, 16 );
 
-  var kickADSR = waveformADSRFn( 0, adsrFn( 0.01, 0.1, 0.1, 0.1, 0.2 ) );
+  var kickADSR = waveformADSRFn( 0.05, adsrFn( 0.01, 0.02, 0.4, 0.5, 0.05 ) );
 
   function hat( sample, time ) {
     var wave = _.clamp( sine( sample ) + _.randFloatSpread( 1.2 ), -1, 1 );
@@ -159,13 +170,13 @@ window.AudioTest = function() {
 
   function bass( sample, time ) {
     var wave = 0.5 * ( sine( sample ) + sine( 0.5 * sample ) );
-    var env = Math.exp( -time * 8 );
+    var env = Math.exp( -time * 4 );
     return wave * env;
   }
 
   function build( note, fn, duration, volume, detune ) {
     detune = detune || 0;
-    return create( generate( toFreq( note ) + detune, duration, fn ), volume );
+    return create( generate( toFreq( note + detune ), duration, fn ), volume );
   }
 
 
@@ -187,35 +198,35 @@ window.AudioTest = function() {
   var CS4 = E3 + 9;
 
 
-  var b1note = build( B1, bell, 2, 0.05 );
-  var b2note = build( B2, bell, 2, 0.05 );
-  var b3note = build( B3, bell, 2, 0.05 );
-  var b4note = build( B4, bell, 2, 0.05 );
+  // var b1note = build( B1, bell, 2, 0.05 );
+  // var b2note = build( B2, bell, 2, 0.05 );
+  // var b3note = build( B3, bell, 2, 0.05 );
+  // var b4note = build( B4, bell, 2, 0.05 );
 
-  var e1note = build( E1, bell, 2, 0.05 );
-  var e2note = build( E2, bell, 2, 0.05 );
-  var e3note = build( E3, bell, 2, 0.05 );
-  var e4note = build( E4, bell, 2, 0.05 );
+  // var e1note = build( E1, bell, 2, 0.05 );
+  // var e2note = build( E2, bell, 2, 0.05 );
+  // var e3note = build( E3, bell, 2, 0.05 );
+  // var e4note = build( E4, bell, 2, 0.05 );
 
-  var a1note = build( A1, bell, 2, 0.05 );
-  var a2note = build( A2, bell, 2, 0.05 );
-  var a3note = build( A3, bell, 2, 0.05 );
-  var a4note = build( A4, bell, 2, 0.05 );
+  // var a1note = build( A1, bell, 2, 0.05 );
+  // var a2note = build( A2, bell, 2, 0.05 );
+  // var a3note = build( A3, bell, 2, 0.05 );
+  // var a4note = build( A4, bell, 2, 0.05 );
 
-  var gs1note = build( GS1, bell, 2, 0.05 );
-  var gs2note = build( GS2, bell, 2, 0.05 );
-  var gs3note = build( GS3, bell, 2, 0.05 );
+  // var gs1note = build( GS1, bell, 2, 0.05 );
+  // var gs2note = build( GS2, bell, 2, 0.05 );
+  // var gs3note = build( GS3, bell, 2, 0.05 );
 
-  var fs2note = build( FS2, bell, 2, 0.05 );
-  var fs3note = build( FS3, bell, 2, 0.05 );
+  // var fs2note = build( FS2, bell, 2, 0.05 );
+  // var fs3note = build( FS3, bell, 2, 0.05 );
 
-  var ds2note = build( DS2, bell, 2, 0.05 );
-  var ds3note = build( DS3, bell, 2, 0.05 );
-  var ds4note = build( DS4, bell, 2, 0.05 );
+  // var ds2note = build( DS2, bell, 2, 0.05 );
+  // var ds3note = build( DS3, bell, 2, 0.05 );
+  // var ds4note = build( DS4, bell, 2, 0.05 );
 
-  var cs2note = build( CS2, bell, 2, 0.05 );
-  var cs3note = build( CS3, bell, 2, 0.05 );
-  var cs4note = build( CS4, bell, 2, 0.05 );
+  // var cs2note = build( CS2, bell, 2, 0.05 );
+  // var cs3note = build( CS3, bell, 2, 0.05 );
+  // var cs4note = build( CS4, bell, 2, 0.05 );
 
   var e4hat = build( B4, hat, 0.05, 0.02 );
 
@@ -263,7 +274,9 @@ window.AudioTest = function() {
   var cs4bass2 = build( CS4, bass, 0.4, 0.2 );
   var cs3bass3 = build( CS3, bass, 0.5, 0.2 );
 
-  var kicknoteADSR = build( E3, kickADSR, 1, 0.5 );
+  var kicknoteADSR = build( E2, kickADSR, 0.5, 1 );
+  var kicknote2ADSR = build( E2, kickADSR, 0.5, 1 );
+  var kicknote3ADSR = build( E2, kickADSR, 0.5, 1 );
 
   function playOn( sound, delay ) {
     setTimeout(function() {
@@ -279,8 +292,8 @@ window.AudioTest = function() {
 
   // playOn( e4hat, 1000 );
   playOn( e3bass, 1500 );
-  playOn( e3note, 2000 );
-  playOn( kicknoteADSR, 1000 );
+  // playOn( e3note, 2000 );
+  playOn( kicknoteADSR, 2000 );
 
 
   var bar = 0;
