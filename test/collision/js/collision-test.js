@@ -69,7 +69,7 @@ window.CollisionTest = function() {
   function createMaterial() {
     return new Material({
       color: new Color( 1, 1, 1 ),
-      fillVisible: false,
+      fill: false,
       wireframe: true
     });
   }
@@ -145,11 +145,11 @@ window.CollisionTest = function() {
       bt.setFromObject( boxMesh );
       if ( boundingBox.isIntersectionBox( bt ) ) {
         boxMesh.material.color.setRGB( 1, 0, 0 );
-        boxMesh.material.fillVisible = true;
+        boxMesh.material.fill = true;
         boxMesh.material.opacity = 0.5;
       } else {
         boxMesh.material.color.setRGB( 0, 1, 0 );
-        boxMesh.material.fillVisible = false;
+        boxMesh.material.fill = false;
         boxMesh.material.opacity = 1;
       }
     }

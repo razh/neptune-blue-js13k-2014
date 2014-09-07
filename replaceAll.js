@@ -94,7 +94,6 @@ var substitutions = {
   '.mB': '.maskBits',
   '.grI': '.groupIndex',
   // Material properties.
-  'fV': 'fillVisible',
   'wf': 'wireframe',
   'op': 'opacity',
   'bl': 'blending',

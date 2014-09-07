@@ -17,7 +17,7 @@ function Material( options ) {
   this.opacity = ( options.opacity !== undefined ) ? options.opacity : 1;
   this.lineWidth = options.lineWidth || 0;
 
-  this.fillVisible = ( options.fillVisible !== undefined ) ? options.fillVisible : true;
+  this.fill = ( options.fill !== undefined ) ? options.fill : true;
   this.wireframe = ( options.wireframe !== undefined ) ? options.wireframe : false;
 
   this.shadowColor = options.shadowColor || new Color();
@@ -49,7 +49,7 @@ Material.prototype.draw = function( ctx, alpha ) {
     ctx.globalAlpha = this.opacity * alpha;
   }
 
-  if ( this.fillVisible ) {
+  if ( this.fill ) {
     ctx.fill();
   }
 
