@@ -26,6 +26,7 @@ function Game( width, height ) {
   });
 
   this.tick = this.tick.bind( this );
+  this.onUpdate = null;
 }
 
 Game.prototype.tick = function() {
@@ -48,6 +49,10 @@ Game.prototype.update = function() {
   }
 
   dt *= 1e-3;
+
+  if ( this.onUpdate ) {
+    this.onUpdate( dt );
+  }
 
   this.scene.children.forEach(function( object ) {
     object.update( dt );

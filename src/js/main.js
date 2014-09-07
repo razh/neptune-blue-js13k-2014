@@ -125,7 +125,7 @@ menu.id = 'm';
 addClass( menu, 'c' );
 append( container, menu );
 
-// Begin button
+// Begin button.
 var playButton = createButton( menu, 'p', 'PLAY', function() {
   game.play();
   addClass( menu, 'h' );
@@ -139,6 +139,7 @@ on( window, 'blur', function() {
   }
 });
 
+// Key listeners.
 var keys = {};
 
 on( document, 'keydown', function( event ) {
@@ -151,7 +152,8 @@ on( document, 'keyup', function( event ) {
 
 var speed = 20;
 
-mesh.update = function( dt ) {
+// Global update function.
+game.onUpdate = function( dt ) {
   // Left arrow. A.
   if ( keys[ 37 ] || keys[ 65 ] ) {
     camera.translateX( -speed * dt );
