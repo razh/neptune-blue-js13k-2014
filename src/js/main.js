@@ -3,6 +3,7 @@
 var Game = require( './game' );
 var Color = require( './math/color' );
 var Vector3 = require( './math/vector3' );
+var Box3 = require( './math/box3' );
 var Face3 = require( './geometry/face3' );
 var Geometry = require( './geometry/geometry' );
 var Material = require( './materials/material' );
@@ -66,44 +67,70 @@ container.appendChild( game.canvas );
 
 var scene = game.scene;
 
-var geometry = new Geometry();
+/**
+ * Box geometry.
+ */
+function createBoxGeometry( width, height, depth ) {
+  var geometry = new Geometry();
 
-geometry.push(
-  [
-    -2, 0, -2,
-    -2, 0,  2,
-    2,  0,  2,
-    2,  0, -2,
+  var halfWidth = width / 2,
+      halfHeight = height / 2,
+      halfDepth = depth / 2;
+
+  var vertices = [
+    // Counterclockwise from far left.
+    // Bottom.
+    -halfWidth, -halfHeight, -halfDepth,
+    -halfWidth, -halfHeight,  halfDepth,
+    halfWidth,  -halfHeight,  halfDepth,
+    halfWidth,  -halfHeight, -halfDepth,
     // Top.
-    -2, 4, -2,
-    -2, 4,  2,
-    2,  4,  2,
-    2,  4, -2
-  ],
-  [
+    -halfWidth, halfHeight, -halfDepth,
+    -halfWidth, halfHeight,  halfDepth,
+    halfWidth,  halfHeight,  halfDepth,
+    halfWidth,  halfHeight, -halfDepth
+  ];
+
+
+  var faces = [
     // Sides.
     [ 0, 1, 5, 4 ],
     [ 1, 2, 6, 5 ],
     [ 2, 3, 7, 6 ],
     [ 3, 0, 4, 7 ],
+
+    // Bottom.
+    [ 0, 3, 2, 1 ],
     // Top.
     [ 4, 5, 6, 7 ]
-  ]
-);
+  ];
 
-geometry.computeFaceNormals();
+  return geometry.push( vertices, faces );
+}
 
-var material = new LambertMaterial({
-  color: new Color( 1, 1, 1 ),
-  diffuse: new Color( 0.5, 0.5, 0.5 ),
-  ambient: new Color( 0.5, 0.5, 0.5 )
-});
+function createBoxMaterial() {
+  return new LambertMaterial({
+    color: new Color( 1, 1, 1 ),
+    diffuse: new Color( 0.5, 0.5, 0.5 ),
+    ambient: new Color( 0.5, 0.5, 0.5 )
+  });
+}
 
-var mesh = new Mesh( geometry, material );
-mesh.position.x = 5;
-mesh.position.z = 20;
-scene.add( mesh );
+var boxGeometry = createBoxGeometry( 2, 2, 2 );
+boxGeometry.computeFaceNormals();
 
+var boxMaterial = createBoxMaterial();
+
+var boxMesh = new Mesh( boxGeometry, boxMaterial );
+boxMesh.position.x = 5;
+boxMesh.position.y = 2;
+boxMesh.position.z = 20;
+scene.add( boxMesh );
+
+
+/**
+ * Ship geometry.
+ */
 function addFuselageGeometry( geometry, forward, aft, width, height ) {
   forward = forward || 3;
   aft = aft || 1;
@@ -253,6 +280,10 @@ var shipMaterial = new LambertMaterial({
 var shipMesh = new Mesh( shipGeometry, shipMaterial );
 scene.add( shipMesh );
 
+
+/**
+ * Plane geometry.
+ */
 function createPlaneGeometry( width, height, widthSegments, heightSegments ) {
   var ix, iz;
 
@@ -333,6 +364,9 @@ wavesMesh2.position.y = wavesMesh.position.y;
 wavesMesh2.position.z = planeHeight;
 scene.add( wavesMesh2 );
 
+/**
+ * Lights, camera, action.
+ */
 var light = new DirectionalLight( new Color( 1, 1, 1 ) );
 light.intensity = 2;
 light.position.set( -4, 2, 0 );
