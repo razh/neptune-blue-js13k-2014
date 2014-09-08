@@ -395,19 +395,23 @@ menu.id = 'm';
 addClass( menu, 'c' );
 append( container, menu );
 
-// Begin button.
-var playButton = createButton( menu, 'p', 'PLAY', function() {
+function play() {
   game.play();
   addClass( menu, 'h' );
-});
+}
 
-on( window, 'blur', function() {
+// Begin button.
+var playButton = createButton( menu, 'p', 'PLAY', play );
+
+function pause() {
   if ( game.running ) {
     game.pause();
     playButton.textContent = 'RESUME';
     removeClass( menu, 'h' );
   }
-});
+}
+
+on( window, 'blur', pause );
 
 // Key listeners.
 var keys = {};
@@ -418,6 +422,11 @@ on( document, 'keydown', function( event ) {
 
 on( document, 'keyup', function( event ) {
   keys[ event.keyCode ] = false;
+
+  // Space. Resume.
+  if ( event.keyCode === 32 && !game.running ) {
+    play();
+  }
 });
 
 var speed = 30;
