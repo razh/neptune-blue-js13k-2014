@@ -9,7 +9,6 @@ var RenderableQuad = require( './renderable-quad' );
 
 var Projector = require( './projector' );
 
-var PointLight = require( '../lights/point-light' );
 var LambertMaterial = require( '../materials/lambert-material' );
 
 function Renderer( options ) {
@@ -44,9 +43,7 @@ function Renderer( options ) {
   _intensity = 0,
   _fogDensity,
 
-  _vector3 = new Vector3(),
-  _centroid = new Vector3(),
-  _lightPosition = new Vector3();
+  _vector3 = new Vector3();
 
   if ( !_ctx ) {
     return;
@@ -147,37 +144,22 @@ function Renderer( options ) {
     _ctx.restore();
   };
 
-  function calculateLight( element, position, material, color ) {
+  function calculateLight( element, material, color ) {
     var normal = element.normalModel;
     // Cumulative blur intensity of directional lights.
     var intensity = 0;
-    var light, isPointLight;
+    var light;
     var amount;
     for ( var l = 0, ll = _lights.length; l < ll; l++ ) {
       light = _lights[l];
-
       _lightColor.copy( light.color );
-      _lightPosition.setFromMatrixPosition( light.matrixWorld );
 
-      isPointLight = light instanceof PointLight;
-      if ( isPointLight ) {
-        amount = normal.dot( _vector3.subVectors( _lightPosition, position ).normalize() );
-      } else {
-        amount = normal.dot( _lightPosition.normalize() );
-      }
+      _vector3.setFromMatrixPosition( light.matrixWorld )
+        .normalize();
 
+      amount = normal.dot( _vector3 );
       if ( amount <= 0 ) {
         continue;
-      }
-
-      if ( isPointLight ) {
-        amount *= light.distance ?
-          1 - Math.min( position.distanceTo( _lightPosition ) / light.distance, 1 )
-          : 1;
-
-        if ( !amount ) {
-          continue;
-        }
       }
 
       amount *= light.intensity;
@@ -237,17 +219,7 @@ function Renderer( options ) {
       _emissiveColor.copy( material.emissive );
       _color.copy( _ambientLight );
 
-      _centroid.copy( v0.positionWorld )
-        .add( v1.positionWorld )
-        .add( v2.positionWorld );
-
-      if ( isQuad ) {
-        _centroid.add( v3.positionWorld ).multiplyScalar( 1 / 4 );
-      } else {
-        _centroid.multiplyScalar( 1 / 3 );
-      }
-
-      _intensity = calculateLight( element, _centroid, material, _color );
+      _intensity = calculateLight( element, material, _color );
 
       _color.multiply( _diffuseColor ).add( _emissiveColor );
       material.draw( _ctx, _color, fogAlpha, _intensity );
