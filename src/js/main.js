@@ -2,6 +2,7 @@
 'use strict';
 
 var Game = require( './game' );
+var Object3D = require( './object3d' );
 var Color = require( './math/color' );
 var Vector3 = require( './math/vector3' );
 var Box3 = require( './math/box3' );
@@ -204,29 +205,29 @@ function bassline( b0, b1, b2 ) {
   playOn( b2, _n2 );
 }
 
-var bar = 0;
+var audioBar;
 
 function playAll() {
-  if ( bar % 2 < 1 ) {
+  if ( audioBar % 2 < 1 ) {
     playOn( kicknote );
-    if ( bar % 16 >= 12 ) {
+    if ( audioBar % 16 >= 12 ) {
       playOn( kicknote3, _n4 + _n8 );
     }
 
     playOn( snarenote, _n2 );
     playOn( kicknote2, _n2 + _n4 + _n8 );
 
-  } else if ( bar % 4 < 2 ) {
+  } else if ( audioBar % 4 < 2 ) {
     playOn( kicknote, _n4 );
     playOn( snarenote, _n2 );
     playOn( kicknote2, _n2 + _n4 + _n8 );
 
-  } else if ( bar % 8 < 4 ){
+  } else if ( audioBar % 8 < 4 ){
     playOn( kicknote, _n4 );
     playOn( snarenote, _n2 );
     playOn( kicknote2, _n2 + _n4 );
 
-  } else if ( bar % 16 < 8 ) {
+  } else if ( audioBar % 16 < 8 ) {
     playOn( kicknote, _n4 );
     playOn( snarenote, _n2 );
     playOn( kicknote2, _n2 + _n4 );
@@ -241,7 +242,7 @@ function playAll() {
 
   }
 
-  var bassIndex = bar % 32;
+  var bassIndex = audioBar % 32;
 
   if ( bassIndex < 4 ) {
     bassline( gs3bass, gs3bass2, gs3bass3 );
@@ -261,14 +262,14 @@ function playAll() {
     bassline( gs3bass, gs3bass2, gs3bass3 );
   }
 
-  bar++;
+  audioBar++;
 }
 
 
 /**
  * Scene geometry.
  */
-var scene = game.scene;
+var scene;
 
 /**
  * Box geometry.
@@ -323,12 +324,7 @@ var boxGeometry = createBoxGeometry( 2, 2, 2 );
 boxGeometry.computeFaceNormals();
 
 var boxMaterial = createBoxMaterial();
-
 var boxMesh = new Mesh( boxGeometry, boxMaterial );
-boxMesh.position.x = 5;
-boxMesh.position.y = 2;
-boxMesh.position.z = 20;
-scene.add( boxMesh );
 
 
 /**
@@ -480,8 +476,7 @@ var shipMaterial = new LambertMaterial({
   lineWidth: 0.5
 });
 
-var shipMesh = new Mesh( shipGeometry, shipMaterial );
-scene.add( shipMesh );
+var shipMesh;
 
 
 /**
@@ -557,31 +552,67 @@ var planeMaterial = new LambertMaterial({
 });
 
 var wavesMesh = new Mesh( planeGeometry, planeMaterial );
-wavesMesh.position.z = 0;
-wavesMesh.position.y = -2;
-scene.add( wavesMesh );
-
 var wavesMesh2 = new Mesh( planeGeometry, planeMaterial );
-wavesMesh2.position.x = -2 * planeSegmentWidth;
-wavesMesh2.position.y = wavesMesh.position.y;
-wavesMesh2.position.z = planeHeight;
-scene.add( wavesMesh2 );
+
+game.ambient.setRGB( 0.3, 0.3, 0.3 );
 
 /**
  * Lights, camera, action.
  */
 var light = new DirectionalLight( new Color( 1, 1, 1 ) );
 light.intensity = 2;
-light.position.set( -4, 2, 0 );
-scene.add( light );
-
-scene.fogDensity = 0.08;
-game.ambient.setRGB( 0.3, 0.3, 0.3 );
 
 var camera = game.camera;
-camera.position.set( 0, 3.5, -5 );
-camera.lookAt( new Vector3( 0, 3, 0 ) );
-camera.updateProjectionMatrix();
+
+var speed = 30;
+var limit = 6;
+var turnRate = 180 * DEG_TO_RAD;
+
+// State variables.
+var time;
+var audioTime;
+var planeOffset;
+
+var score = 0;
+var highScore = 0;
+
+function reset() {
+  time = 0;
+  planeOffset = 0;
+  // Start playing immediately.
+  audioBar = 0;
+  audioTime = NOTE;
+
+  scene = game.scene = new Object3D();
+
+  boxMesh.position.x = 5;
+  boxMesh.position.y = 2;
+  boxMesh.position.z = 20;
+  scene.add( boxMesh );
+
+  shipMesh = new Mesh( shipGeometry, shipMaterial );
+  scene.add( shipMesh );
+
+  wavesMesh.position.z = 0;
+  wavesMesh.position.y = -2;
+  scene.add( wavesMesh );
+
+  // Waves meshes.
+  wavesMesh2.position.x = -2 * planeSegmentWidth;
+  wavesMesh2.position.y = wavesMesh.position.y;
+  wavesMesh2.position.z = planeHeight;
+  scene.add( wavesMesh2 );
+
+  // Light.
+  light.position.set( -4, 2, 0 );
+  scene.add( light );
+
+  scene.fogDensity = 0.08;
+
+  camera.position.set( 0, 3.5, -5 );
+  camera.lookAt( new Vector3( 0, 3, 0 ) );
+  camera.updateProjectionMatrix();
+}
 
 function createButton( el, id, text, action ) {
   var button = create( 'button' );
@@ -632,18 +663,13 @@ on( document, 'keyup', function( event ) {
   }
 });
 
-var speed = 30;
-var limit = 6;
-var turnRate = 180 * DEG_TO_RAD;
-var time = 0;
-var audioTime = 0;
-var waveOffset = 0;
-var planeOffset = 0;
+reset();
 
 // Global update function.
 game.onUpdate = function( dt ) {
   var position = shipMesh.position;
   var rotation = shipMesh.rotation;
+
   // Right arrow. D.
   if ( keys[ 39 ] || keys[ 68 ] ) {
     if ( position.x > -limit ) {
@@ -685,8 +711,7 @@ game.onUpdate = function( dt ) {
   for ( var i = 0, il = vertices.length; i < il; i++ ) {
     x = i % il;
     z = Math.floor( i / il );
-    waveOffset = x + z;
-    vertices[i].y = 0.8 * Math.sin( 10 * time + waveOffset );
+    vertices[i].y = 0.8 * Math.sin( 10 * time + ( x + z ) );
   }
 
   // Update wave tiling.
