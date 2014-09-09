@@ -113,25 +113,25 @@ var kicknote = synth( E1, kick, _n2 + _n8, 1 );
 var kicknote2 = synth( E1, kick, _n2 + _n8, 0.6 );
 var kicknote3 = synth( E1, kick, _n2 + _n8, 0.6 );
 
-var gs3bass = synth( GS3, bass, _n2, 0.3 );
-var gs3bass2 = synth( GS3, bass, _n2, 0.2 );
-var gs3bass3 = synth( GS3, bass, _n2 + _n8, 0.2 );
+var gs3bass = synth( GS3, bass, _n2, 0.2 );
+var gs3bass2 = synth( GS3, bass, _n2, 0.1 );
+var gs3bass3 = synth( GS3, bass, _n2 + _n8, 0.1 );
 
-var fs3bass = synth( FS3, bass, _n2, 0.3 );
-var fs3bass2 = synth( FS3, bass, _n2, 0.2 );
-var fs3bass3 = synth( FS3, bass, _n2 + _n8, 0.2 );
+var fs3bass = synth( FS3, bass, _n2, 0.2 );
+var fs3bass2 = synth( FS3, bass, _n2, 0.1 );
+var fs3bass3 = synth( FS3, bass, _n2 + _n8, 0.1 );
 
-var e3bass = synth( E3, bass, _n2, 0.3 );
-var e3bass2 = synth( E3, bass, _n2, 0.2 );
-var e3bass3 = synth( E3, bass, _n2 + _n8, 0.2 );
+var e3bass = synth( E3, bass, _n2, 0.2 );
+var e3bass2 = synth( E3, bass, _n2, 0.1 );
+var e3bass3 = synth( E3, bass, _n2 + _n8, 0.1 );
 
-var ds3bass = synth( DS3, bass, _n2, 0.3 );
-var ds3bass2 = synth( DS3, bass, _n2, 0.2 );
-var ds3bass3 = synth( DS3, bass, _n2 + _n8, 0.2 );
+var ds3bass = synth( DS3, bass, _n2, 0.2 );
+var ds3bass2 = synth( DS3, bass, _n2, 0.1 );
+var ds3bass3 = synth( DS3, bass, _n2 + _n8, 0.1 );
 
-var cs3bass = synth( CS3, bass, _n2, 0.3 );
-var cs3bass2 = synth( CS3, bass, _n2, 0.2 );
-var cs3bass3 = synth( CS3, bass, _n2 + _n8, 0.2 );
+var cs3bass = synth( CS3, bass, _n2, 0.2 );
+var cs3bass2 = synth( CS3, bass, _n2, 0.1 );
+var cs3bass3 = synth( CS3, bass, _n2 + _n8, 0.1 );
 
 function bassline( b0, b1, b2 ) {
   playOn( b0 );
