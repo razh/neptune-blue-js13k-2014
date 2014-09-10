@@ -176,8 +176,6 @@ function Renderer( options ) {
   }
 
   function renderFace( element, material, isQuad, v0, v1, v2, v3 ) {
-    _this.info.render.vertices += isQuad ? 4 : 3;
-
     // Set basic properties.
     material.set( _ctx );
     _ctx.beginPath();
@@ -188,17 +186,6 @@ function Renderer( options ) {
     _v1y = v1.positionScreen.y;
     _v2x = v2.positionScreen.x;
     _v2y = v2.positionScreen.y;
-
-    if ( isQuad ) {
-      _v3x = v3.positionScreen.x;
-      _v3y = v3.positionScreen.y;
-
-      drawQuad( _v0x, _v0y, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y );
-      _this.info.render.quads++;
-    } else {
-      drawTriangle( _v0x, _v0y, _v1x, _v1y, _v2x, _v2y );
-      _this.info.render.faces++;
-    }
 
     var fogAlpha = 1;
     // Compute fogAlpha.
@@ -212,6 +199,23 @@ function Renderer( options ) {
         Math.pow( 2, -_fogDensity * _fogDensity * depth * depth / Math.LN2 ),
         0, 1
       );
+
+      if ( !fogAlpha ) {
+        return;
+      }
+    }
+
+    _this.info.render.vertices += isQuad ? 4 : 3;
+
+    if ( isQuad ) {
+      _v3x = v3.positionScreen.x;
+      _v3y = v3.positionScreen.y;
+
+      drawQuad( _v0x, _v0y, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y );
+      _this.info.render.quads++;
+    } else {
+      drawTriangle( _v0x, _v0y, _v1x, _v1y, _v2x, _v2y );
+      _this.info.render.faces++;
     }
 
     if ( material instanceof LambertMaterial ) {
