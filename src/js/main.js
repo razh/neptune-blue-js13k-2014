@@ -30,7 +30,7 @@ function off( el, type, listener ) {
 }
 
 function create( type ) {
-  return document.createElement( type );
+  return document.createElement( type || 'div' );
 }
 
 function append( parent, el ) {
@@ -530,7 +530,8 @@ light.intensity = 2;
 
 var camera = game.camera;
 
-var speed = 30;
+var vz = 12;
+var vx = 30;
 var limit = 6;
 var turnRate = 180 * DEG_TO_RAD;
 
@@ -539,10 +540,11 @@ var time;
 var audioTime;
 var planeOffset;
 
-var score = 0;
+var score;
 var highScore = 0;
 
 function reset() {
+  score = 0;
   time = 0;
   planeOffset = 0;
   // Start playing immediately.
@@ -590,10 +592,19 @@ function createButton( el, id, text, action ) {
 }
 
 // Create menu.
-var menu = create( 'div' );
+var menu = create();
 menu.id = 'm';
 addClass( menu, 'c' );
 append( container, menu );
+
+// Score-tracking.
+var scoreEl = create();
+scoreEl.id = 's';
+append( container, scoreEl );
+
+var highScoreEl = create();
+highScoreEl.id = 'hs';
+append( container, highScoreEl );
 
 function play() {
   game.play();
@@ -606,12 +617,19 @@ var playButton = createButton( menu, 'p', 'PLAY', play );
 function pause() {
   if ( game.running ) {
     game.pause();
-    playButton.textContent = 'RESUME';
+    textContent( playButton, 'RESUME' );
     removeClass( menu, 'h' );
   }
 }
 
 on( window, 'blur', pause );
+
+function end() {
+  game.pause();
+  reset();
+  textContent( playButton, 'Again?' );
+  removeClass( menu, 'h' );
+}
 
 // Key listeners.
 var keys = {};
@@ -639,7 +657,7 @@ game.onUpdate = function( dt ) {
   // Right arrow. D.
   if ( keys[ 39 ] || keys[ 68 ] ) {
     if ( position.x > -limit ) {
-      position.x -= speed * dt;
+      position.x -= vx * dt;
       rotation.z = Math.max( rotation.z - turnRate * dt, -HALF_PI );
     }
   }
@@ -647,7 +665,7 @@ game.onUpdate = function( dt ) {
   // Left arrow. A.
   if ( keys[ 37 ] || keys[ 65 ] ) {
     if ( position.x < limit ) {
-      position.x += speed * dt;
+      position.x += vx * dt;
       rotation.z = Math.min( rotation.z + turnRate * dt, HALF_PI );
     }
   }
@@ -658,7 +676,7 @@ game.onUpdate = function( dt ) {
     rotation.z = 0;
   }
 
-  position.z += 12 * dt;
+  position.z += vz * dt;
   camera.position.z = position.z - 5;
 
   shipMesh.updateQuaternion();
@@ -709,4 +727,21 @@ game.onUpdate = function( dt ) {
   }
 
   planeGeometry.computeFaceNormals();
+
+  /**
+   * TODO: Calculate collisions.
+   */
+  // Temporary end condition.
+  if ( keys[ 81 ] ) {
+    return end();
+  }
+
+  // Update score.
+  score = 10 * position.z;
+  if ( score > highScore ) {
+    highScore = score;
+  }
+
+  textContent( highScoreEl, 'HIGH SCORE: ' + ( highScore | 0 ) );
+  textContent( scoreEl, 'SCORE: ' + ( score | 0 ) );
 };
