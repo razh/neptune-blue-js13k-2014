@@ -69,75 +69,42 @@ var game = new Game(
 var container = $( '#g' );
 container.appendChild( game.canvas );
 
-var samplingRate = 44100;
-
-// Notes.
-var A4 = 69;
-var E1 = 28;
-var E3 = 52;
-var CS3 = 49;
-var DS3 = 51;
-var GS3 = 56;
-var FS3 = 54;
-
-var pcmPrefix = 'data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAA';
-
-// Convert big-endian 32-bit (8-byte) number to little-endian string for
-// PCM headers.
-function dataLength( n ) {
-  return String.fromCharCode.apply( null, [
-    n & 0xFF,
-    ( n >> 8 ) & 0xFF,
-    ( n >> 16 ) & 0xFF,
-    ( n >> 24 ) & 0xFF
-  ]);
-}
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext();
+var sampleRate = audioContext.sampleRate;
 
 function toFreq( note ) {
-  return Math.pow( 2, ( note - A4 ) / 12 ) * 440;
+  // A4 is 69.
+  return Math.pow( 2, ( note - 69 ) / 12 ) * 440;
 }
 
-function createAudioFile( data, volume ) {
-  // Add 'data' prefix.
-  var audio = new Audio( pcmPrefix + btoa( 'data' + dataLength( data ) + data ) );
-  audio.volume = volume;
-  return audio;
-}
-
-function playAudio( sound ) {
-  if ( sound.readyState ) {
-    sound.currentTime = 0;
-  }
-
-  sound.play();
-}
+// Notes.
+var E1 = toFreq( 28 );
+var E3 = toFreq( 52 );
+var CS3 = toFreq( 49 );
+var DS3 = toFreq( 51 );
+var GS3 = toFreq( 56 );
+var FS3 = toFreq( 54 );
 
 // Delay is in seconds.
-function playOn( sound, delay ) {
-  setTimeout(function() {
-    playAudio( sound );
-  }, delay * 1e3 );
+function playSound( sound, delay ) {
+  var source = audioContext.createBufferSource();
+  source.buffer = sound;
+  source.connect( audioContext.destination );
+  source.start( delay ? audioContext.currentTime + delay : 0 );
 }
 
-function generateAudio( freq, duration, fn ) {
-  var sound = '';
-
+function generateAudioBuffer( freq, fn, duration, volume ) {
   // duration is in seconds.
-  var length = duration * samplingRate;
-  var sample, wave;
+  var length = duration * sampleRate;
+
+  var buffer = audioContext.createBuffer( 1, length, sampleRate );
+  var channel = buffer.getChannelData(0);
   for ( var i = 0; i < length; i++ ) {
-    sample = freq * i / samplingRate;
-    wave = 32767 * fn( sample, i / length );
-    sound += String.fromCharCode( wave & 0xFF );
-    sound += String.fromCharCode( ( wave >> 8 ) & 0xFF );
+    channel[i] = fn( freq * i / sampleRate, i / length ) * volume;
   }
 
-  return sound;
-}
-
-// Generate audio data and create an audio file.
-function synth( note, fn, duration, volume ) {
-  return createAudioFile( generateAudio( toFreq( note ), duration, fn ), volume );
+  return buffer;
 }
 
 function sine( sample ) {
@@ -153,7 +120,7 @@ function waveformFn( noise, decay ) {
 }
 
 // Waveforms.
-var kick = waveformFn( 0.1, 32 );
+var kick = waveformFn( 0.05, 24 );
 var snare = waveformFn( 0.8, 16 );
 
 function bass( sample, time ) {
@@ -171,74 +138,73 @@ var _n4 = _n2 / 2;
 var _n8 = _n4 / 2;
 
 // Sounds.
-var snarenote = synth( E3, snare, _n4, 0.3 );
-var snarenote2 = synth( E3, snare, _n4, 0.2 );
-var snarenote3 = synth( E3, snare, _n4 + _n8, 0.4 );
+var snarenote = generateAudioBuffer( E3, snare, _n4, 0.2 );
+var snarenote2 = generateAudioBuffer( E3, snare, _n4, 0.1 );
+var snarenote3 = generateAudioBuffer( E3, snare, _n4 + _n8, 0.3 );
 
-var kicknote = synth( E1, kick, _n2 + _n8, 1 );
-var kicknote2 = synth( E1, kick, _n2 + _n8, 0.6 );
-var kicknote3 = synth( E1, kick, _n2 + _n8, 0.6 );
+var kicknote = generateAudioBuffer( E1, kick, _n2 + _n8, 1 );
+var kicknote2 = generateAudioBuffer( E1, kick, _n2 + _n8, 0.6 );
 
-var gs3bass = synth( GS3, bass, _n2, 0.2 );
-var gs3bass2 = synth( GS3, bass, _n2, 0.1 );
-var gs3bass3 = synth( GS3, bass, _n2 + _n8, 0.1 );
+var gs3bass = generateAudioBuffer( GS3, bass, _n2, 0.2 );
+var gs3bass2 = generateAudioBuffer( GS3, bass, _n2, 0.1 );
+var gs3bass3 = generateAudioBuffer( GS3, bass, _n2 + _n8, 0.1 );
 
-var fs3bass = synth( FS3, bass, _n2, 0.2 );
-var fs3bass2 = synth( FS3, bass, _n2, 0.1 );
-var fs3bass3 = synth( FS3, bass, _n2 + _n8, 0.1 );
+var fs3bass = generateAudioBuffer( FS3, bass, _n2, 0.2 );
+var fs3bass2 = generateAudioBuffer( FS3, bass, _n2, 0.1 );
+var fs3bass3 = generateAudioBuffer( FS3, bass, _n2 + _n8, 0.1 );
 
-var e3bass = synth( E3, bass, _n2, 0.2 );
-var e3bass2 = synth( E3, bass, _n2, 0.1 );
-var e3bass3 = synth( E3, bass, _n2 + _n8, 0.1 );
+var e3bass = generateAudioBuffer( E3, bass, _n2, 0.2 );
+var e3bass2 = generateAudioBuffer( E3, bass, _n2, 0.1 );
+var e3bass3 = generateAudioBuffer( E3, bass, _n2 + _n8, 0.1 );
 
-var ds3bass = synth( DS3, bass, _n2, 0.2 );
-var ds3bass2 = synth( DS3, bass, _n2, 0.1 );
-var ds3bass3 = synth( DS3, bass, _n2 + _n8, 0.1 );
+var ds3bass = generateAudioBuffer( DS3, bass, _n2, 0.2 );
+var ds3bass2 = generateAudioBuffer( DS3, bass, _n2, 0.1 );
+var ds3bass3 = generateAudioBuffer( DS3, bass, _n2 + _n8, 0.1 );
 
-var cs3bass = synth( CS3, bass, _n2, 0.2 );
-var cs3bass2 = synth( CS3, bass, _n2, 0.1 );
-var cs3bass3 = synth( CS3, bass, _n2 + _n8, 0.1 );
+var cs3bass = generateAudioBuffer( CS3, bass, _n2, 0.2 );
+var cs3bass2 = generateAudioBuffer( CS3, bass, _n2, 0.1 );
+var cs3bass3 = generateAudioBuffer( CS3, bass, _n2 + _n8, 0.1 );
 
 function bassline( b0, b1, b2 ) {
-  playOn( b0 );
-  playOn( b1, _n4 );
-  playOn( b2, _n2 );
+  playSound( b0 );
+  playSound( b1, _n4 );
+  playSound( b2, _n2 );
 }
 
 var audioBar;
 
 function playAll() {
   if ( audioBar % 2 < 1 ) {
-    playOn( kicknote );
+    playSound( kicknote );
     if ( audioBar % 16 >= 12 ) {
-      playOn( kicknote3, _n4 + _n8 );
+      playSound( kicknote2, _n4 + _n8 );
     }
 
-    playOn( snarenote, _n2 );
-    playOn( kicknote2, _n2 + _n4 + _n8 );
+    playSound( snarenote, _n2 );
+    playSound( kicknote2, _n2 + _n4 + _n8 );
 
   } else if ( audioBar % 4 < 2 ) {
-    playOn( kicknote, _n4 );
-    playOn( snarenote, _n2 );
-    playOn( kicknote2, _n2 + _n4 + _n8 );
+    playSound( kicknote, _n4 );
+    playSound( snarenote, _n2 );
+    playSound( kicknote2, _n2 + _n4 + _n8 );
 
   } else if ( audioBar % 8 < 4 ){
-    playOn( kicknote, _n4 );
-    playOn( snarenote, _n2 );
-    playOn( kicknote2, _n2 + _n4 );
+    playSound( kicknote, _n4 );
+    playSound( snarenote, _n2 );
+    playSound( kicknote2, _n2 + _n4 );
 
   } else if ( audioBar % 16 < 8 ) {
-    playOn( kicknote, _n4 );
-    playOn( snarenote, _n2 );
-    playOn( kicknote2, _n2 + _n4 );
-    playOn( kicknote3, _n2 + _n4 + _n8 );
+    playSound( kicknote, _n4 );
+    playSound( snarenote, _n2 );
+    playSound( kicknote2, _n2 + _n4 );
+    playSound( kicknote2, _n2 + _n4 + _n8 );
 
   } else {
-    playOn( kicknote, _n4 );
-    playOn( snarenote, _n2 );
-    playOn( kicknote2, _n2 + _n8 );
-    playOn( snarenote2, _n2 + _n4 );
-    playOn( snarenote3, _n2 + _n4 + _n8 );
+    playSound( kicknote, _n4 );
+    playSound( snarenote, _n2 );
+    playSound( kicknote2, _n2 + _n8 );
+    playSound( snarenote2, _n2 + _n4 );
+    playSound( snarenote3, _n2 + _n4 + _n8 );
 
   }
 
