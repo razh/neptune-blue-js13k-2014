@@ -61,8 +61,8 @@ function removeClass( el, className ) {
 
 
 var game = new Game(
-  Math.min( window.innerWidth, 568 ),
-  Math.min( window.innerHeight, 320 )
+  Math.min( window.innerWidth, 852 ),
+  Math.min( window.innerHeight, 480 )
 );
 
 
@@ -593,11 +593,11 @@ function reset() {
   shipMesh = new Mesh( shipGeometry, shipMaterial );
   scene.add( shipMesh );
 
+  // Waves meshes.
   wavesMesh.position.z = 0;
   wavesMesh.position.y = -2;
   scene.add( wavesMesh );
 
-  // Waves meshes.
   wavesMesh2.position.x = -2 * planeSegmentWidth;
   wavesMesh2.position.y = wavesMesh.position.y;
   wavesMesh2.position.z = planeHeight;
@@ -730,13 +730,13 @@ game.onUpdate = function( dt ) {
     return x;
   }
 
-  if ( wavesMesh.position.z + planeHeight < position.z ) {
+  if ( wavesMesh.position.z + 0.5 * planeHeight < position.z ) {
     wavesMesh.position.x = calculatePlaneOffsetX( planeOffset );
     wavesMesh.position.z += 2 * planeHeight;
     planeOffset++;
   }
 
-  if ( wavesMesh2.position.z + planeHeight < position.z ) {
+  if ( wavesMesh2.position.z + 0.5 * planeHeight < position.z ) {
     wavesMesh2.position.x = calculatePlaneOffsetX( planeOffset );
     wavesMesh2.position.z += 2 * planeHeight;
     planeOffset++;
