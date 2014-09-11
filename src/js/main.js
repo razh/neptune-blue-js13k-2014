@@ -282,26 +282,21 @@ function createBoxMaterial() {
   return new LambertMaterial({
     color: new Color( 1, 1, 1 ),
     diffuse: new Color( 0.5, 0.5, 0.5 ),
-    ambient: new Color( 0.5, 0.5, 0.5 )
+    ambient: new Color( 0.5, 0.5, 0.5 ),
+    // Bump up opacity to better handle fog.
+    opacity: 10
   });
 }
 
 var boxGeometry = createBoxGeometry( 2, 2, 2 );
 boxGeometry.computeFaceNormals();
 
-var boxMaterial = createBoxMaterial();
-var boxMesh = new Mesh( boxGeometry, boxMaterial );
-
+var boxMeshes;
 
 /**
  * Ship geometry.
  */
 function addFuselageGeometry( geometry, forward, aft, width, height ) {
-  forward = forward || 3;
-  aft = aft || 1;
-  width = width || 1;
-  height = height || 0.5;
-
   var halfWidth = width / 2,
       halfHeight = height / 2;
 
@@ -502,7 +497,6 @@ var planeHeight = 16;
 var planeWidthSegments = 16;
 var planeHeightSegments = 8;
 var planeSegmentWidth = planeWidth / planeWidthSegments;
-var planeSegmentHeight = planeHeight / planeHeightSegments;
 
 var planeGeometry = createPlaneGeometry(
   planeWidth, planeHeight,
@@ -532,10 +526,9 @@ light.intensity = 2;
 
 var camera = game.camera;
 
-var vz = 12;
-var vx = 30;
+var vz, vx;
 var limit = 6;
-var turnRate = 180 * DEG_TO_RAD;
+var turnRate = 240 * DEG_TO_RAD;
 
 // State variables.
 var time;
@@ -546,6 +539,9 @@ var score;
 var highScore = 0;
 
 function reset() {
+  vz = 24;
+  vx = 30;
+
   score = 0;
   time = 0;
   planeOffset = 0;
@@ -555,10 +551,19 @@ function reset() {
 
   scene = game.scene = new Object3D();
 
-  boxMesh.position.x = 5;
-  boxMesh.position.y = 2;
-  boxMesh.position.z = 20;
-  scene.add( boxMesh );
+  // Collision test meshes.
+  boxMeshes = [];
+  var boxMesh;
+  for ( var i = 0; i < 12; i++ ) {
+    boxMesh = new Mesh( boxGeometry, createBoxMaterial() );
+    boxMesh.position.set(
+      ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 16 ) ),
+      _.randFloat( -1, 6 ),
+      _.randFloat( 30, 60 )
+    );
+    boxMeshes.push( boxMesh );
+    scene.add( boxMesh );
+  }
 
   shipMesh = new Mesh( shipGeometry, shipMaterial );
   scene.add( shipMesh );
@@ -651,6 +656,10 @@ on( document, 'keyup', function( event ) {
 
 reset();
 
+// Collision detection.
+var boundingBox = new Box3();
+var bt = new Box3();
+
 // Global update function.
 game.onUpdate = function( dt ) {
   var position = shipMesh.position;
@@ -682,6 +691,36 @@ game.onUpdate = function( dt ) {
   camera.position.z = position.z - 5;
 
   shipMesh.updateQuaternion();
+  shipMesh.updateMatrix();
+  boundingBox.setFromObject( shipMesh );
+
+  var boxMesh;
+  var boxPosition;
+  var i, il;
+  var scale = 1 + 0.3 * ( 1 + Math.cos( audioTime / NOTE * Math.PI * 4 ) );
+  for ( i = 0, il = boxMeshes.length; i < il; i++ ) {
+    boxMesh = boxMeshes[i];
+
+    boxPosition = boxMesh.position;
+    boxMesh.scale.set( scale, scale, scale );
+    if ( boxPosition.z < position.z - 6 ) {
+      boxPosition.set(
+        ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 18 ) ),
+        _.randFloat( -2, 4 ),
+        position.z + _.randFloat( 30, 60 )
+      );
+    }
+
+    boxMesh.updateMatrix();
+    bt.setFromObject( boxMesh );
+    if ( boundingBox.isIntersectionBox( bt ) ) {
+      boxMesh.material.color.setRGB( 0, 0, 0 );
+      vx = vz = 0;
+      setTimeout( end, 256 );
+    } else {
+      boxMesh.material.color.setRGB( 1, 1, 1 );
+    }
+  }
 
   // Update music.
   audioTime += dt * 1e3;
@@ -694,7 +733,7 @@ game.onUpdate = function( dt ) {
   time += dt;
   var vertices = planeGeometry.vertices;
   var x, z;
-  for ( var i = 0, il = vertices.length; i < il; i++ ) {
+  for ( i = 0, il = vertices.length; i < il; i++ ) {
     x = i % il;
     z = Math.floor( i / il );
     vertices[i].y = 0.8 * Math.sin( 10 * time + ( x + z ) );
