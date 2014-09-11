@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require( '../utils' );
 var Color = require( '../math/color' );
 
 var FrontSide  = 0,
@@ -46,7 +47,7 @@ Material.prototype.set = function( ctx ) {
 
 Material.prototype.draw = function( ctx, alpha ) {
   if ( alpha !== undefined ) {
-    ctx.globalAlpha = this.opacity * alpha;
+    ctx.globalAlpha = _.clamp( this.opacity * alpha, 0, 1 );
   }
 
   if ( this.fill ) {
