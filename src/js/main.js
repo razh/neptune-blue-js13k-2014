@@ -65,6 +65,7 @@ var game = new Game(
   Math.min( window.innerHeight, 480 )
 );
 
+var _vector3 = new Vector3();
 
 var container = $( '#g' );
 container.appendChild( game.canvas );
@@ -292,6 +293,15 @@ var boxGeometry = createBoxGeometry( 2, 2, 2 );
 boxGeometry.computeFaceNormals();
 
 var boxMeshes;
+
+function randomBoxPosition() {
+  return _vector3.set(
+    // x is from +/-[2, 18] to avoid camera intersections.
+    ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 16 ) ),
+    _.randFloat( -1, 6 ),
+    _.randFloat( 30, 60 )
+  );
+}
 
 /**
  * Ship geometry.
@@ -525,8 +535,12 @@ var light = new DirectionalLight( new Color( 1, 1, 1 ) );
 light.intensity = 2;
 
 var camera = game.camera;
+var cameraY = 3.5;
+var cameraOffsetZ = -5;
 
-var vz, vx;
+var alive;
+var vz = 24;
+var vx = 30;
 var limit = 6;
 var turnRate = 240 * DEG_TO_RAD;
 
@@ -539,8 +553,7 @@ var score;
 var highScore = 0;
 
 function reset() {
-  vz = 24;
-  vx = 30;
+  alive = true;
 
   score = 0;
   time = 0;
@@ -556,11 +569,7 @@ function reset() {
   var boxMesh;
   for ( var i = 0; i < 12; i++ ) {
     boxMesh = new Mesh( boxGeometry, createBoxMaterial() );
-    boxMesh.position.set(
-      ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 16 ) ),
-      _.randFloat( -1, 6 ),
-      _.randFloat( 30, 60 )
-    );
+    boxMesh.position.copy( randomBoxPosition() );
     boxMeshes.push( boxMesh );
     scene.add( boxMesh );
   }
@@ -584,7 +593,7 @@ function reset() {
 
   scene.fogDensity = 0.08;
 
-  camera.position.set( 0, 3.5, -5 );
+  camera.position.set( 0, cameraY, cameraOffsetZ );
   camera.lookAt( new Vector3( 0, 3, 0 ) );
   camera.updateProjectionMatrix();
 }
@@ -662,6 +671,20 @@ var bt = new Box3();
 
 // Global update function.
 game.onUpdate = function( dt ) {
+  // Update music.
+  audioTime += dt * 1e3;
+  if ( audioTime > NOTE ) {
+    playAll();
+    audioTime = 0;
+  }
+
+  // Slow down time on collision.
+  if ( !alive ) {
+    dt *= 0.1;
+    camera.position.x = _.randFloatSpread(1);
+    camera.position.y = cameraY + _.randFloatSpread(1);
+  }
+
   var position = shipMesh.position;
   var rotation = shipMesh.rotation;
 
@@ -688,7 +711,7 @@ game.onUpdate = function( dt ) {
   }
 
   position.z += vz * dt;
-  camera.position.z = position.z - 5;
+  camera.position.z = position.z + cameraOffsetZ;
 
   shipMesh.updateQuaternion();
   shipMesh.updateMatrix();
@@ -703,31 +726,27 @@ game.onUpdate = function( dt ) {
 
     boxPosition = boxMesh.position;
     boxMesh.scale.set( scale, scale, scale );
-    if ( boxPosition.z < position.z - 6 ) {
-      boxPosition.set(
-        ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 18 ) ),
-        _.randFloat( -2, 4 ),
-        position.z + _.randFloat( 30, 60 )
-      );
+    if ( boxPosition.z < position.z + cameraOffsetZ ) {
+      boxPosition.copy( randomBoxPosition() );
+      boxPosition.z += position.z;
+    }
+
+    if ( !alive ) {
+      continue;
     }
 
     boxMesh.updateMatrix();
     bt.setFromObject( boxMesh );
     if ( boundingBox.isIntersectionBox( bt ) ) {
-      boxMesh.material.color.setRGB( 0, 0, 0 );
-      vx = vz = 0;
-      setTimeout( end, 256 );
+      boxMesh.material.color.setRGB( 1, 0, 0 );
+      alive = false;
+      setTimeout( end, 512 );
+      break;
     } else {
       boxMesh.material.color.setRGB( 1, 1, 1 );
     }
   }
 
-  // Update music.
-  audioTime += dt * 1e3;
-  if ( audioTime > NOTE ) {
-    playAll();
-    audioTime = 0;
-  }
 
   // Update waves.
   time += dt;
