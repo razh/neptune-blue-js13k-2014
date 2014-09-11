@@ -56,7 +56,7 @@ window.PolyhedronTest = function() {
     lineWidth: 10,
     opacity: 1,
     shadowColor: new Color( 1, 0, 0 ),
-    blur: 32
+    shadowBlur: 32
   });
 
   var mesh = new Mesh( geometry, material );

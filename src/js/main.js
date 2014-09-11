@@ -433,11 +433,13 @@ function createShipGeometry() {
 }
 
 var shipGeometry = createShipGeometry();
-var shipMaterial = new LambertMaterial({
+var shipMaterial = new LambertGlowMaterial({
   color: new Color( 0.6, 0.6, 0.65 ),
   strokeColor: new Color( 1, 1, 1 ),
   diffuse: new Color( 1, 1, 1 ),
   ambient: new Color( 0.3, 0.3, 0.3 ),
+  shadowColor: new Color( 1, 1, 1 ),
+  shadowBlur: 8,
   wireframe: true,
   lineWidth: 0.5
 });

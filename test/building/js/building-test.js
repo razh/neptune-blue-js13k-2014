@@ -73,7 +73,7 @@ window.BuildingTest = function() {
     ambient: new Color( 0.5, 0.5, 0.5 ),
     diffuse: new Color( 0.5, 0.5, 0.5 ),
     shadowColor: new Color( 1, 1, 1 ),
-    blur: 16
+    shadowBlur: 16
   });
 
   var mesh = new Mesh( boxGeometry, material );

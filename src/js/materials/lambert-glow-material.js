@@ -7,15 +7,13 @@ var Filter = require( '../math/filter' );
 function LambertGlowMaterial( options ) {
   options = options || {};
   LambertMaterial.call( this, options );
-
-  this.blur = options.blur || 0;
   this.filter = new Filter();
 }
 
 _.extends( LambertGlowMaterial, LambertMaterial );
 
 LambertGlowMaterial.prototype.draw = function( ctx, color, alpha, intensity ) {
-  ctx.shadowBlur = this.blur * intensity;
+  ctx.shadowBlur = this.shadowBlur * intensity;
   LambertMaterial.prototype.draw.call( this, ctx, color, alpha );
 };
 
