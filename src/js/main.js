@@ -166,6 +166,8 @@ var cs3bass = generateAudioBuffer( CS3, bass, _n2, 0.2 );
 var cs3bass2 = generateAudioBuffer( CS3, bass, _n2, 0.1 );
 var cs3bass3 = generateAudioBuffer( CS3, bass, _n2 + _n8, 0.1 );
 
+var explosion = generateAudioBuffer( E1, waveformFn( 0.2, 16 ), 6 * _n2, 1 );
+
 function bassline( b0, b1, b2 ) {
   playSound( b0 );
   playSound( b1, _n4 );
@@ -232,6 +234,13 @@ function playAll() {
   audioBar++;
 }
 
+function playExplosion() {
+  playSound( explosion );
+  playSound( kicknote );
+  playSound( explosion, 0.1 * Math.random() );
+  playSound( kicknote, 0.2 * Math.random() );
+  playSound( explosion, 0.4 * Math.random() );
+}
 
 /**
  * Scene geometry.
@@ -673,7 +682,7 @@ var bt = new Box3();
 game.onUpdate = function( dt ) {
   // Update music.
   audioTime += dt * 1e3;
-  if ( audioTime > NOTE ) {
+  if ( alive && audioTime > NOTE ) {
     playAll();
     audioTime = 0;
   }
@@ -740,6 +749,7 @@ game.onUpdate = function( dt ) {
     if ( boundingBox.isIntersectionBox( bt ) ) {
       boxMesh.material.color.setRGB( 1, 0, 0 );
       alive = false;
+      playExplosion();
       setTimeout( end, 512 );
       break;
     } else {
