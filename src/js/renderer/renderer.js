@@ -2,7 +2,7 @@
 
 var Color = require( '../math/color' );
 var Vector3 = require( '../math/vector3' );
-var Utils = require( '../utils' );
+var _ = require( '../utils' );
 
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
@@ -222,7 +222,7 @@ function Renderer( options ) {
       // w here is clip.w, where gl_FragCoord.w = 1 / clip.w.
       var depth = element.z * w;
 
-      fogAlpha = Utils.clamp(
+      fogAlpha = _.clamp(
         Math.pow( 2, -_fogDensity * _fogDensity * depth * depth / Math.LN2 ),
         0, 1
       );

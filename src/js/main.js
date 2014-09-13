@@ -366,7 +366,7 @@ var boxMeshes;
 function randomBoxPosition() {
   return _vector3.set(
     // x is from +/-[2, 18] to avoid camera intersections.
-    ( Math.random() < 0.5 ? -1 : 1 ) * ( 2 + _.randFloat( 0, 16 ) ),
+    _.randSign() * ( 2 + _.randFloat( 0, 16 ) ),
     _.randFloat( -1, 6 ),
     _.randFloat( 30, 60 )
   );
@@ -625,7 +625,7 @@ function explosionProgram( ctx ) {
   /*jshint validthis:false*/
 }
 
-// Create sprites.
+// Create explosion sprites.
 var sprite, spriteMaterial;
 for ( var i = 0; i < 24; i++ ) {
   spriteMaterial = new SpriteCanvasMaterial({
@@ -665,6 +665,38 @@ function addExplosion( v ) {
       _.randFloatSpread( 2 )
     ).add( v );
   }
+}
+
+/**
+ * Star sprites.
+ */
+var starSprites = [];
+var starOffsetZ = 50;
+var starSpawnOffsetZ = 100;
+
+function starProgram( ctx ) {
+  drawDiamond( ctx, 0.5 );
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+}
+
+// Create star sprites.
+for ( i = 0; i < 48; i++) {
+  spriteMaterial = new SpriteCanvasMaterial({
+    blending: 'lighter'
+  });
+
+  spriteMaterial.program = starProgram;
+  sprite = new Sprite( spriteMaterial );
+  starSprites.push( sprite );
+}
+
+function randomStarPosition() {
+  return _vector3.set(
+    _.randSign() * _.randFloatSpread( 400 ),
+    _.randFloat( 60, 120 ),
+    _.randFloat( 100, 100 + starSpawnOffsetZ )
+  );
 }
 
 /**
@@ -733,6 +765,13 @@ function reset() {
   resetExplosionSprites();
   for ( i = 0, il = explosionSprites.length; i < il; i++ ) {
     scene.add( explosionSprites[i] );
+  }
+
+  // Star sprites.
+  for ( i = 0, il = starSprites.length; i < il; i++ ) {
+    sprite = starSprites[i];
+    sprite.position.copy( randomStarPosition() );
+    scene.add( sprite );
   }
 
   // Light.
@@ -898,6 +937,7 @@ game.onUpdate = function( dt ) {
       boxMesh.material.color.setRGB( 1, 0.1, 0.1 );
 
       // Add explosion sprites.
+      resetExplosionSprites();
       addExplosion(
         _vector3.copy( shipMesh.position )
           .add( boxMesh.position )
@@ -971,12 +1011,20 @@ game.onUpdate = function( dt ) {
     velocity.add( _vector3.copy( explosionGravity ).multiplyScalar( dt ) );
   }
 
-  /**
-   * TODO: Calculate collisions.
-   */
-  // Temporary end condition.
-  if ( keys[ 81 ] ) {
-    return end();
+  // Update stars.
+  var spritePosition;
+  var spriteDepth;
+  for ( i = 0, il = starSprites.length; i < il; i++ ) {
+    sprite = starSprites[i];
+    spritePosition = sprite.position;
+    spritePosition.z -= 40 * dt;
+    if ( spritePosition.z < position.z + starOffsetZ ) {
+      spritePosition.copy( randomStarPosition() );
+      spritePosition.z += position.z + starSpawnOffsetZ;
+    }
+
+    spriteDepth = spritePosition.z - position.z;
+    sprite.material.opacity = _.clamp( -spriteDepth / 400 + 1, 0, 1 );
   }
 
   // Update score.
