@@ -23,6 +23,23 @@ Vector4.prototype.copy = function( v ) {
   return this;
 };
 
+Vector4.prototype.multiplyScalar = function( scalar ) {
+  this.x *= scalar;
+  this.y *= scalar;
+  this.z *= scalar;
+  this.w *= scalar;
+  return this;
+};
+
+Vector4.prototype.lerp = function( v, alpha ) {
+  this.x += ( v.x - this.x ) * alpha;
+  this.y += ( v.y - this.y ) * alpha;
+  this.z += ( v.z - this.z ) * alpha;
+  this.w += ( v.w - this.w ) * alpha;
+
+  return this;
+};
+
 Vector4.prototype.applyMatrix4 = function( m ) {
   var x = this.x,
       y = this.y,
