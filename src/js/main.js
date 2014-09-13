@@ -59,6 +59,64 @@ function removeClass( el, className ) {
   el.classList.remove( className );
 }
 
+function numericSort( a, b ) {
+  return a - b;
+}
+
+function removeIndices( array, indices ) {
+  indices.sort( numericSort );
+  var i = indices.length;
+  while ( i-- ) {
+    array.splice( indices[i], 1 );
+  }
+}
+
+var animate = (function() {
+  var animations = [];
+
+  function update( dt ) {
+    var removedIndices = [];
+
+    /**
+     * Animations are stored as a 3-element array:
+     *
+     *   [ fn, duration, time ]
+     *
+     * Where:
+     *   fn - animation callback function. Receives time as a parameter.
+     *   duration - animation duration.
+     *   time - elapsed time.
+     */
+    var animation;
+    var duration, time;
+    for ( var i = 0, il = animations.length; i < il; i++ ) {
+      animation = animations[i];
+
+      duration = animation[1];
+      time = animation[2] += dt;
+      if ( time >= duration ) {
+        removedIndices.push( i );
+      }
+
+      animation[0]( _.clamp( time / duration, 0, 1 ) );
+    }
+
+    removeIndices( animations, removedIndices );
+  }
+
+  function animate( fn, duration ) {
+    if ( fn ) {
+      animations.push( [ fn, duration || 0, 0 ] );
+    }
+
+    return animate;
+  }
+
+  animate.update = update;
+
+  return animate;
+}) ();
+
 
 var game = new Game(
   Math.min( window.innerWidth, 852 ),
@@ -693,6 +751,8 @@ game.onUpdate = function( dt ) {
     camera.position.x = _.randFloatSpread(1);
     camera.position.y = cameraY + _.randFloatSpread(1);
   }
+
+  animate.update( dt );
 
   var position = shipMesh.position;
   var rotation = shipMesh.rotation;
