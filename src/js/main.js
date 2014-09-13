@@ -15,6 +15,7 @@ var SpriteCanvasMaterial = require( './materials/sprite-canvas-material' );
 var Mesh = require( './objects/mesh' );
 var Sprite = require( './objects/sprite' );
 var DirectionalLight = require( './lights/directional-light' );
+var createIcosahedronGeometry = require( './geometry/icosahedron-geometry' );
 
 var _ = require( './utils' );
 
@@ -311,62 +312,37 @@ function playExplosionSound() {
 var scene;
 
 /**
- * Box geometry.
+ * Enemy geometry.
  */
-function createBoxGeometry( width, height, depth ) {
-  var geometry = new Geometry();
+function createEnemyGeometry() {
+  var geometry = createIcosahedronGeometry();
+  var vertices = geometry.vertices;
 
-  var halfWidth = width / 2,
-      halfHeight = height / 2,
-      halfDepth = depth / 2;
+  for ( var i = 0, il = vertices.length; i < il; i++ ) {
+    vertices[i].multiplyScalar( _.randFloat( 1, 1.3 ) );
+  }
 
-  var vertices = [
-    // Counterclockwise from far left.
-    // Bottom.
-    -halfWidth, -halfHeight, -halfDepth,
-    -halfWidth, -halfHeight,  halfDepth,
-    halfWidth,  -halfHeight,  halfDepth,
-    halfWidth,  -halfHeight, -halfDepth,
-    // Top.
-    -halfWidth, halfHeight, -halfDepth,
-    -halfWidth, halfHeight,  halfDepth,
-    halfWidth,  halfHeight,  halfDepth,
-    halfWidth,  halfHeight, -halfDepth
-  ];
-
-
-  var faces = [
-    // Sides.
-    [ 0, 1, 5, 4 ],
-    [ 1, 2, 6, 5 ],
-    [ 2, 3, 7, 6 ],
-    [ 3, 0, 4, 7 ],
-
-    // Bottom.
-    [ 0, 3, 2, 1 ],
-    // Top.
-    [ 4, 5, 6, 7 ]
-  ];
-
-  return geometry.push( vertices, faces );
+  geometry.computeFaceNormals();
+  return geometry;
 }
 
-function createBoxMaterial() {
+var enemyColor = new Color( 0.6, 0.4, 0.4 );
+var enemyHitColor = new Color().copy( enemyColor );
+enemyHitColor.r += 0.3;
+function createEnemyMaterial() {
   return new LambertMaterial({
-    color: new Color( 1, 1, 1 ),
-    diffuse: new Color( 0.5, 0.5, 0.5 ),
-    ambient: new Color( 0.5, 0.5, 0.5 ),
+    color: new Color().copy( enemyColor ),
+    ambient: new Color( 0.5, 0.3, 0.8 ),
+    diffuse: new Color( 0.3, 0.2, 0.1 ),
     // Bump up opacity to better handle fog.
-    opacity: 10
+    opacity: 10,
+    overdraw: 0.5
   });
 }
 
-var boxGeometry = createBoxGeometry( 2, 2, 2 );
-boxGeometry.computeFaceNormals();
+var enemyMeshes;
 
-var boxMeshes;
-
-function randomBoxPosition() {
+function randomEnemyPosition() {
   return _vector3.set(
     // x is from +/-[2, 18] to avoid camera intersections.
     _.randSign() * ( 2 + _.randFloat( 0, 16 ) ),
@@ -705,7 +681,7 @@ function randomStarPosition() {
 /**
  * Lights, camera, action.
  */
-game.ambient.setRGB( 0.3, 0.3, 0.3 );
+game.ambient.setRGB( 0.3, 0.3, 0.5 );
 
 var light = new DirectionalLight( new Color( 1, 1, 1 ) );
 light.intensity = 2;
@@ -741,14 +717,16 @@ function reset() {
   scene = game.scene = new Object3D();
 
   // Collision test meshes.
-  boxMeshes = [];
-  var boxMesh;
+  enemyMeshes = [];
+  var enemyMesh;
+  var enemyGeometry;
   var i, il;
   for ( i = 0; i < 12; i++ ) {
-    boxMesh = new Mesh( boxGeometry, createBoxMaterial() );
-    boxMesh.position.copy( randomBoxPosition() );
-    boxMeshes.push( boxMesh );
-    scene.add( boxMesh );
+    enemyGeometry = createEnemyGeometry();
+    enemyMesh = new Mesh( enemyGeometry, createEnemyMaterial() );
+    enemyMesh.position.copy( randomEnemyPosition() );
+    enemyMeshes.push( enemyMesh );
+    scene.add( enemyMesh );
   }
 
   shipMesh = new Mesh( shipGeometry, shipMaterial );
@@ -942,34 +920,38 @@ game.onUpdate = function( dt ) {
   shipMesh.updateMatrix();
   boundingBox.setFromObject( shipMesh ).expandByScalar( -0.2 );
 
-  var boxMesh;
-  var boxPosition;
+  var enemyMesh;
+  var enemyPosition;
   var i, il;
-  var scale = 1 + 0.3 * ( 1 + Math.cos( audioTime / NOTE * Math.PI * 4 ) );
-  for ( i = 0, il = boxMeshes.length; i < il; i++ ) {
-    boxMesh = boxMeshes[i];
+  var scale = 0.7 + 0.2 * ( 1 + Math.cos( audioTime / NOTE * Math.PI * 4 ) );
+  for ( i = 0, il = enemyMeshes.length; i < il; i++ ) {
+    enemyMesh = enemyMeshes[i];
 
-    boxPosition = boxMesh.position;
-    boxMesh.scale.set( scale, scale, scale );
-    if ( boxPosition.z < position.z + cameraOffsetZ ) {
-      boxPosition.copy( randomBoxPosition() );
-      boxPosition.z += position.z;
+    enemyPosition = enemyMesh.position;
+    if ( enemyPosition.z < position.z + cameraOffsetZ ) {
+      enemyPosition.copy( randomEnemyPosition() );
+      enemyPosition.z += position.z;
     }
 
     if ( !alive ) {
       continue;
     }
 
-    boxMesh.updateMatrix();
-    bt.setFromObject( boxMesh );
+    enemyMesh.scale.set( scale, scale, scale );
+    enemyMesh.updateMatrix();
+    bt.setFromObject( enemyMesh ).expandByScalar( -0.1 );
+    // Hacky attempt to rotate on a random axis.
+    enemyMesh.rotateX( 1.6 * ( i % 7 - 3.5 ) * dt );
+    enemyMesh.rotateY( 1.6 * ( i % 6 - 3 ) * dt );
+    enemyMesh.rotateZ( 1.6 * ( i % 5 - 2.5 ) * dt );
     if ( boundingBox.isIntersectionBox( bt ) ) {
-      boxMesh.material.color.setRGB( 1, 0.1, 0.1 );
+      enemyMesh.material.color.copy( enemyHitColor );
 
       // Add explosion sprites.
       resetExplosionSprites();
       addExplosion(
         _vector3.copy( shipMesh.position )
-          .add( boxMesh.position )
+          .add( enemyMesh.position )
           .multiplyScalar( 0.5 )
       );
 
@@ -978,7 +960,7 @@ game.onUpdate = function( dt ) {
       setTimeout( end, 1024 );
       break;
     } else {
-      boxMesh.material.color.setRGB( 1, 1, 1 );
+      enemyMesh.material.color.copy( enemyColor );
     }
   }
 
