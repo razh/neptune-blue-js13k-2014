@@ -890,6 +890,13 @@ var livesEl = create();
 livesEl.id = 'l';
 append( container, livesEl );
 
+// Help.
+var helpEl = create();
+helpEl.id = 'hp';
+helpEl.innerHTML = 'A/D  \u2190/\u2192.' +
+  '<div>Space to start.</div>';
+append( container, helpEl );
+
 // Resize handling.
 var expanded = false;
 
