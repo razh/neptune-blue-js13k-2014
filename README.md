@@ -15,7 +15,12 @@ Neptune Blue | js13k 2014
 
 Expand/contract the game window with the [<->] button on the right.
 
-##### Development
+### Releases
+ 
+##### 1.0.0 
+Initial release.
+
+### Development
 
 To start a development server:
 
@@ -29,9 +34,10 @@ To build for production:
 
     $ gulp build -p
 
-##### Notes
+### Notes
 
 This is built with a stripped-down and heavily modified version of [three.js](https://github.com/mrdoob/three.js).
 
-##### Thanks to
-* [ooflorent](https://github.com/ooflorent) for [js13k-boilerplate](https://github.com/ooflorent/js13k-boilerplate).
+### Thanks to
+- [end3r](https://github.com/end3r) for js13k.
+- [ooflorent](https://github.com/ooflorent) for [js13k-boilerplate](https://github.com/ooflorent/js13k-boilerplate).
