@@ -130,7 +130,12 @@ var animate = (function() {
     return animate;
   }
 
+  function reset() {
+    animations = [];
+  }
+
   animate.update = update;
+  animate.reset = reset;
 
   return animate;
 }) ();
@@ -801,6 +806,7 @@ function reset() {
   audioBar = 0;
   audioTime = NOTE;
 
+  animate.reset();
   scene = game.scene = new Object3D();
 
   // Collision test meshes.
@@ -1187,6 +1193,7 @@ game.onUpdate = function( dt ) {
     }
     // Goodbye power-up.
     else if ( !lifeAcquired && lifeSprite.position.z < position.z + cameraOffsetZ ) {
+      lifeSprite.visible = false;
       resetLifeTimer();
     }
   }
