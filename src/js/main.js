@@ -748,8 +748,6 @@ game.onUpdate = function( dt ) {
   // Slow down time on collision.
   if ( !alive ) {
     dt *= 0.1;
-    camera.position.x = _.randFloatSpread(1);
-    camera.position.y = cameraY + _.randFloatSpread(1);
   }
 
   animate.update( dt );
@@ -773,17 +771,23 @@ game.onUpdate = function( dt ) {
     }
   }
 
+  position.z += vz * dt;
   rotation.z -= 4 * rotation.z * dt;
 
   if ( Math.abs( rotation.z ) < 1e-2 ) {
     rotation.z = 0;
   }
 
-  position.z += vz * dt;
   var cameraX = 0.1 * position.x;
   camera.position.x = cameraX;
   camera.position.z = position.z + cameraOffsetZ;
   camera.lookAt( new Vector3( cameraX, 3, position.z ) );
+
+  // Camera shake.
+  if ( !alive ) {
+    camera.position.x = cameraX + _.randFloatSpread(0.5);
+    camera.position.y = cameraY + _.randFloatSpread(0.5);
+  }
 
   shipMesh.updateQuaternion();
   shipMesh.updateMatrix();
