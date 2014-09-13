@@ -44,7 +44,7 @@ exports.randFloatSpread = function( range ) {
 
 exports.randSign = function() {
   return Math.random() < 0.5 ? -1 : 1;
-}
+};
 
 exports.extends = function( child, parent ) {
   child.prototype = Object.create( parent.prototype );

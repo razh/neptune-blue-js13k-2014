@@ -125,6 +125,14 @@ Vector3.prototype.normalize = function() {
   return this.multiplyScalar( length ? 1 / length : 0 );
 };
 
+Vector3.prototype.lerp = function( v, alpha ) {
+  this.x += ( v.x - this.x ) * alpha;
+  this.y += ( v.y - this.y ) * alpha;
+  this.z += ( v.z - this.z ) * alpha;
+
+  return this;
+};
+
 Vector3.prototype.applyMatrix3 = function( m ) {
   var x = this.x,
       y = this.y,
