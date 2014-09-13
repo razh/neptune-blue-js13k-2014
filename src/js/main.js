@@ -14,6 +14,7 @@ var LambertGlowMaterial = require( './materials/lambert-glow-material' );
 var SpriteCanvasMaterial = require( './materials/sprite-canvas-material' );
 var Mesh = require( './objects/mesh' );
 var Sprite = require( './objects/sprite' );
+var Line = require( './objects/line' );
 var DirectionalLight = require( './lights/directional-light' );
 var createIcosahedronGeometry = require( './geometry/icosahedron-geometry' );
 
@@ -757,6 +758,36 @@ function resetLifeTimer() {
 }
 
 /**
+ * Trail lines.
+ */
+var trailMaterial = new Material({
+  color: new Color( 1, 0.1, 0.1 ),
+  lineWidth: 2,
+  wireframe: true,
+  blending: 'lighter',
+  opacity: 0.5
+});
+
+var trailLeftGeometry = new Geometry();
+var trailLeftLine = new Line( trailLeftGeometry, trailMaterial );
+
+var trailRightGeometry = new Geometry();
+var trailRightLine = new Line( trailRightGeometry, trailMaterial );
+
+function pruneTrail( geometry, z ) {
+  var vertices = geometry.vertices;
+  var vertex;
+  while( vertices.length ) {
+    vertex = vertices[0]
+    if ( vertex.z < z ) {
+      vertices.shift();
+    } else {
+      break;
+    }
+  }
+}
+
+/**
  * Lights, camera, action.
  */
 game.ambient.setRGB( 0.3, 0.3, 0.5 );
@@ -850,6 +881,12 @@ function reset() {
   animate(noop, lifeDelay, function() {
     lifeSpawnable = true;
   });
+
+  // Trails.
+  trailLeftGeometry.vertices = [];
+  trailLeftGeometry.vertices = [];
+  scene.add( trailLeftLine );
+  scene.add( trailRightLine );
 
   // Light.
   light.position.set( -4, 2, 0 );
@@ -1183,6 +1220,12 @@ game.onUpdate = function( dt ) {
       resetLifeTimer();
     }
   }
+
+  // Update trail.
+  trailLeftGeometry.vertices.push( new Vector3( position.x + 1.2, 0, position.z ) );
+  trailRightGeometry.vertices.push( new Vector3( position.x - 1.2, 0, position.z ) );
+  pruneTrail( trailLeftGeometry, position.z + cameraOffsetZ );
+  pruneTrail( trailRightGeometry, position.z + cameraOffsetZ );
 
   // Update score.
   score = 10 * position.z;

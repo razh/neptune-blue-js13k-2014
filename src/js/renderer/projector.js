@@ -13,19 +13,23 @@ var Material = require( '../materials/material' );
 
 var Mesh = require( '../objects/mesh' );
 var Sprite = require( '../objects/sprite' );
+var Line = require( '../objects/line' );
 
 var RenderableObject = require( './renderable-object' );
 var RenderableVertex = require( './renderable-vertex' );
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
 var RenderableSprite = require( './renderable-sprite' );
+var RenderableLine = require( './renderable-line' );
 
 function Projector() {
   var _object, _objectCount, _objectPool = [],
-  _vertex, _vertexCount = 0, _vertexPool = [],
-  _face, _faceCount = 0, _facePool = [],
-  _quadCount = 0, _quadPool = [],
+  _vertex, _vertexCount, _vertexPool = [],
+  _face, _faceCount, _facePool = [],
+  // No need for _quad as _face can be used instead.
+  _quadCount, _quadPool = [],
   _sprite, _spriteCount, _spritePool = [],
+  _line, _lineCount, _linePool = [],
 
   _renderData = { objects: [], lights: [], elements: [] },
 
@@ -43,7 +47,12 @@ function Projector() {
   _viewProjectionMatrix = new Matrix4(),
 
   _modelMatrix,
-  _normalMatrix = new Matrix3();
+  _modelViewProjectionMatrix = new Matrix4(),
+
+  _normalMatrix = new Matrix3(),
+
+  _clippedVertex0PositionScreen = new Vector4(),
+  _clippedVertex1PositionScreen = new Vector4();
 
   function RenderList() {
     var object, material;
@@ -117,6 +126,7 @@ function Projector() {
     _faceCount = 0;
     _quadCount = 0;
     _spriteCount = 0;
+    _lineCount = 0;
     _objectCount = 0;
 
     camera.updateMatrix();
@@ -176,7 +186,48 @@ function Projector() {
       _modelMatrix = object.matrixWorld;
       _vertexCount = 0;
 
-      if ( object instanceof Mesh ) {
+      if ( object instanceof Line ) {
+        _modelViewProjectionMatrix
+          .multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+
+        vertices = geometry.vertices;
+        if ( !vertices.length ) {
+          continue;
+        }
+
+        v0 = getNextVertexInPool();
+        v0.positionScreen.copy( vertices[0] )
+          .applyMatrix4( _modelViewProjectionMatrix );
+
+        for ( v = 1, vl = vertices.length; v < vl; v++ ) {
+          v0 = getNextVertexInPool();
+          v0.positionScreen.copy( vertices[1] )
+            .applyMatrix4( _modelViewProjectionMatrix );
+
+          v1 = _vertexPool[ _vertexCount - 2 ];
+
+          _clippedVertex0PositionScreen.copy( v0.positionScreen );
+          _clippedVertex1PositionScreen.copy( v1.positionScreen );
+          if ( clipLine( _clippedVertex0PositionScreen, _clippedVertex1PositionScreen ) ) {
+            // Perform the perspective divide.
+            _clippedVertex0PositionScreen.multiplyScalar( 1 / _clippedVertex0PositionScreen.w );
+            _clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
+
+            _line = getNextLineInPool();
+
+            _line.id = object.id;
+            _line.v0.positionScreen.copy( _clippedVertex0PositionScreen );
+            _line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
+
+            _line.z = Math.max( _clippedVertex0PositionScreen.z, _clippedVertex1PositionScreen.z );
+
+            _line.material = object.material;
+
+            _renderData.elements.push( _line );
+          }
+        }
+
+      } else if ( object instanceof Mesh ) {
         vertices = geometry.vertices;
         faces = geometry.faces;
 
@@ -341,6 +392,17 @@ function Projector() {
     return _quadPool[ _quadCount++ ];
   }
 
+  function getNextLineInPool() {
+    if ( _lineCount === _linePool.length ) {
+      var line = new RenderableLine();
+      _linePool.push( line );
+      _lineCount++;
+      return line;
+    }
+
+    return _linePool[ _lineCount++ ];
+  }
+
   function getNextSpriteInPool() {
     if ( _spriteCount === _spritePool.length ) {
       var sprite = new RenderableSprite();
@@ -354,6 +416,57 @@ function Projector() {
 
   function painterSort( a, b ) {
     return b.z - a.z;
+  }
+
+
+  function clipLine( s0, s1 ) {
+    var alpha0 = 0, alpha1 = 1,
+
+    // Calculate the boundary coordinate of each vertex for the near and far clip planes,
+    // Z = -1 and Z = +1, respectively.
+    bc0near =  s0.z + s0.w,
+    bc1near =  s1.z + s1.w,
+    bc0far =  -s0.z + s0.w,
+    bc1far =  -s1.z + s1.w;
+
+    if ( bc0near >= 0 && bc1near >= 0 && bc0far >= 0 && bc1far >= 0 ) {
+      // Both vertices lie entirely within all clip planes.
+      return true;
+
+    } else if ( ( bc0near < 0 && bc1near < 0 ) || ( bc0far < 0 && bc1far < 0 ) ) {
+      // Both vertices lie entirely outside one of the clip planes.
+      return false;
+
+    } else {
+      // The line segment spans at least one clip plane.
+      if ( bc0near < 0 ) {
+        // v0 lies outside the near plane, v1 inside
+        alpha0 = Math.max( alpha0, bc0near / ( bc0near - bc1near ) );
+      } else if ( bc1near < 0 ) {
+        // v1 lies outside the near plane, v0 inside
+        alpha1 = Math.min( alpha1, bc0near / ( bc0near - bc1near ) );
+      }
+
+      if ( bc0far < 0 ) {
+        // v0 lies outside the far plane, v1 inside
+        alpha0 = Math.max( alpha0, bc0far / ( bc0far - bc1far ) );
+      } else if ( bc1far < 0 ) {
+        // v1 lies outside the far plane, v1 inside
+        alpha1 = Math.min( alpha1, bc0far / ( bc0far - bc1far ) );
+      }
+
+      if ( alpha1 < alpha0 ) {
+        // The line segment spans two boundaries, but is outside both of them.
+        // (This can't happen when we're only clipping against just near/far but good
+        //  to leave the check here for future usage if other clip planes are added.)
+        return false;
+      } else {
+        // Update the s0 and s1 vertices to match the clipped line segment.
+        s0.lerp( s1, alpha0 );
+        s1.lerp( s0, 1 - alpha1 );
+        return true;
+      }
+    }
   }
 }
 

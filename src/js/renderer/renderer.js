@@ -7,6 +7,7 @@ var _ = require( '../utils' );
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
 var RenderableSprite = require( './renderable-sprite' );
+var RenderableLine = require( './renderable-line' );
 
 var Projector = require( './projector' );
 
@@ -105,6 +106,17 @@ function Renderer( options ) {
 
         renderSprite( element, material );
 
+      } else if ( element instanceof RenderableLine ) {
+        _v0 = element.v0;
+        _v1 = element.v1;
+
+        _v0.positionScreen.x *= _canvasWidthHalf;
+        _v0.positionScreen.y *= _canvasHeightHalf;
+        _v1.positionScreen.x *= _canvasWidthHalf;
+        _v1.positionScreen.y *= _canvasHeightHalf;
+
+        renderLine( _v0, _v1, element, material );
+
       } else if ( element instanceof RenderableFace ) {
         isQuad = element instanceof RenderableQuad;
 
@@ -200,6 +212,16 @@ function Renderer( options ) {
     material.draw( _ctx );
 
     _ctx.restore();
+  }
+
+  function renderLine( v0, v1, element, material ) {
+    material.set( _ctx );
+    _ctx.beginPath();
+
+    _ctx.moveTo( v0.positionScreen.x, v0.positionScreen.y );
+    _ctx.lineTo( v1.positionScreen.x, v1.positionScreen.y );
+
+    _ctx.stroke();
   }
 
   function renderFace( element, material, isQuad, v0, v1, v2, v3 ) {
