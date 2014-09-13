@@ -14,15 +14,14 @@ function randomSign() {
   return Math.random() < 0.5 ? -1 : 1;
 }
 
-function rotatedSquare( ctx, size ) {
-  var halfSize = size / 2;
-
+function drawDiamond( ctx, radius ) {
   // Counter-clockwise from right.
-  ctx.moveTo( halfSize, 0 );
-  ctx.lineTo( 0, halfSize );
-  ctx.lineTo( -halfSize, 0 );
-  ctx.lineTo( 0, -halfSize );
-  ctx.lineTo( halfSize, 0 );
+  ctx.beginPath();
+  ctx.moveTo( radius, 0 );
+  ctx.lineTo( 0, radius );
+  ctx.lineTo( -radius, 0 );
+  ctx.lineTo( 0, -radius );
+  ctx.closePath();
 }
 
 var gravity = new Vector3( 0, -50, 0 );
@@ -46,12 +45,11 @@ window.ExplosionTest = function() {
     /*jshint validthis:true*/
     ctx.moveTo( 0, 0 );
 
-    rotatedSquare( ctx, 3 );
+    drawDiamond( ctx, 1.5 );
     ctx.fillStyle = 'rgba(240, 120, 80, 0.5)';
     ctx.fill();
 
-    ctx.beginPath();
-    rotatedSquare( ctx, 1.5 );
+    drawDiamond( ctx, 0.8 );
     // ctx.arc( 0, 0, 0.5, 0, 2 * Math.PI );
     ctx.fillStyle = this.color.toString();
     ctx.fill();
@@ -89,7 +87,7 @@ window.ExplosionTest = function() {
       sprite.scale.set( 1, 1, 1 );
 
       velocities[i].set(
-        randomSign() * _.randFloatSpread( 50 ),
+        _.randSign() * _.randFloatSpread( 50 ),
         12 + Math.random() * 20,
         Math.random() * 20
       );

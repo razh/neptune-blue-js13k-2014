@@ -11,7 +11,9 @@ var Geometry = require( './geometry/geometry' );
 var Material = require( './materials/material' );
 var LambertMaterial = require( './materials/lambert-material' );
 var LambertGlowMaterial = require( './materials/lambert-glow-material' );
+var SpriteCanvasMaterial = require( './materials/sprite-canvas-material' );
 var Mesh = require( './objects/mesh' );
+var Sprite = require( './objects/sprite' );
 var DirectionalLight = require( './lights/directional-light' );
 
 var _ = require( './utils' );
@@ -292,7 +294,7 @@ function playAll() {
   audioBar++;
 }
 
-function playExplosion() {
+function playExplosionSound() {
   playSound( explosion );
   playSound( kicknote );
   playSound( explosion, 0.1 * Math.random() );
@@ -593,11 +595,83 @@ var planeMaterial = new LambertMaterial({
 var wavesMesh = new Mesh( planeGeometry, planeMaterial );
 var wavesMesh2 = new Mesh( planeGeometry, planeMaterial );
 
-game.ambient.setRGB( 0.3, 0.3, 0.3 );
+/**
+ * Explosion sprites.
+ */
+var explosionGravity = new Vector3( 0, -500, 0 );
+
+var explosionSprites = [];
+var explosionVelocities = [];
+
+function drawDiamond( ctx, radius ) {
+  // Counter-clockwise from right.
+  ctx.beginPath();
+  ctx.moveTo( radius, 0 );
+  ctx.lineTo( 0, radius );
+  ctx.lineTo( -radius, 0 );
+  ctx.lineTo( 0, -radius );
+  ctx.closePath();
+}
+
+function explosionProgram( ctx ) {
+  /*jshint validthis:true*/
+  drawDiamond( ctx, 1 );
+  ctx.fillStyle = 'rgba(240, 120, 80, 0.5)';
+  ctx.fill();
+
+  drawDiamond( ctx, 0.4 );
+  ctx.fillStyle = this.color.toString();
+  ctx.fill();
+  /*jshint validthis:false*/
+}
+
+// Create sprites.
+var sprite, spriteMaterial;
+for ( var i = 0; i < 24; i++ ) {
+  spriteMaterial = new SpriteCanvasMaterial({
+    color: new Color( 1, 1, 1 ),
+    blending: 'lighter',
+    opacity: 0.5
+  });
+  spriteMaterial.program = explosionProgram;
+
+  sprite = new Sprite( spriteMaterial );
+  explosionSprites.push( sprite );
+
+  explosionVelocities.push( new Vector3() );
+}
+
+function resetExplosionSprites() {
+  for ( var i = 0, il = explosionSprites.length; i < il; i++ ) {
+    sprite = explosionSprites[i];
+    sprite.visible = false;
+    sprite.scale.set( 1, 1, 1 );
+
+    explosionVelocities[i].set(
+      _.randSign() * _.randFloatSpread( 48 ),
+      24 + Math.random() * 24,
+      Math.random() * -16
+    );
+  }
+}
+
+function addExplosion( v ) {
+  for ( var i = 0, il = explosionSprites.length; i < il; i++ ) {
+    sprite = explosionSprites[i];
+    sprite.visible = true;
+    sprite.position.set(
+      _.randFloatSpread( 2 ),
+      _.randFloatSpread( 2 ),
+      _.randFloatSpread( 2 )
+    ).add( v );
+  }
+}
 
 /**
  * Lights, camera, action.
  */
+game.ambient.setRGB( 0.3, 0.3, 0.3 );
+
 var light = new DirectionalLight( new Color( 1, 1, 1 ) );
 light.intensity = 2;
 
@@ -634,7 +708,8 @@ function reset() {
   // Collision test meshes.
   boxMeshes = [];
   var boxMesh;
-  for ( var i = 0; i < 12; i++ ) {
+  var i, il;
+  for ( i = 0; i < 12; i++ ) {
     boxMesh = new Mesh( boxGeometry, createBoxMaterial() );
     boxMesh.position.copy( randomBoxPosition() );
     boxMeshes.push( boxMesh );
@@ -653,6 +728,12 @@ function reset() {
   wavesMesh2.position.y = wavesMesh.position.y;
   wavesMesh2.position.z = planeHeight;
   scene.add( wavesMesh2 );
+
+  // Explosion sprites.
+  resetExplosionSprites();
+  for ( i = 0, il = explosionSprites.length; i < il; i++ ) {
+    scene.add( explosionSprites[i] );
+  }
 
   // Light.
   light.position.set( -4, 2, 0 );
@@ -814,10 +895,18 @@ game.onUpdate = function( dt ) {
     boxMesh.updateMatrix();
     bt.setFromObject( boxMesh );
     if ( boundingBox.isIntersectionBox( bt ) ) {
-      boxMesh.material.color.setRGB( 1, 0, 0 );
+      boxMesh.material.color.setRGB( 1, 0.1, 0.1 );
+
+      // Add explosion sprites.
+      addExplosion(
+        _vector3.copy( shipMesh.position )
+          .add( boxMesh.position )
+          .multiplyScalar( 0.5 )
+      );
+
       alive = false;
-      playExplosion();
-      setTimeout( end, 512 );
+      playExplosionSound();
+      setTimeout( end, 1024 );
       break;
     } else {
       boxMesh.material.color.setRGB( 1, 1, 1 );
@@ -864,6 +953,23 @@ game.onUpdate = function( dt ) {
   }
 
   planeGeometry.computeFaceNormals();
+
+  // Update explosion sprites.
+  var explosionDrag = 1 - 0.05 * dt;
+  var velocity;
+  for ( i = 0, il = explosionSprites.length; i < il; i++ ) {
+    sprite = explosionSprites[i];
+    if ( !sprite.visible ) {
+      continue;
+    }
+
+    velocity = explosionVelocities[i];
+    sprite.position.add( _vector3.copy( velocity ).multiplyScalar( dt ) );
+
+    sprite.scale.multiplyScalar( explosionDrag );
+    velocity.multiplyScalar( explosionDrag );
+    velocity.add( _vector3.copy( explosionGravity ).multiplyScalar( dt ) );
+  }
 
   /**
    * TODO: Calculate collisions.
