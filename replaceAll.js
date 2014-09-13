@@ -80,14 +80,11 @@ var substitutions = {
   'el': 'elements',
   '.se': '.scene',
   '.ch': '.children',
-  // Ignore .removeChild.
-  '.rm': /\.remove(?!\w+)/g,
   '.rr': '.renderer',
   '.rg': '.running',
   '.ud': /\.update(?!\w+)/g,
   '.cp': '.copy',
   '.mul': /\.multiply(?!\w+)/g,
-  '.sc': /\.scale(?!\w+)/g,
   '.sP': /\.setPosition(?!\w+)/g,
   '.pS': '.projectScene',
   // Filter properties.
@@ -117,6 +114,7 @@ var substitutions = {
   'N': 'Cannot find module '
 };
 
+// Only for reference rigt now.
 var exclude = [
   'fillStyle',
   'strokeStyle',
@@ -128,10 +126,12 @@ var exclude = [
   'lineTo',
   'setTransform',
   'translate',
+  'scale',
   'fill',
   'stroke',
   'innerWidth',
-  'innerHeight'
+  'innerHeight',
+  'remove'
 ];
 
 module.exports = function() {
