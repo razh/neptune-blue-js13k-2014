@@ -693,8 +693,67 @@ function randomStarPosition() {
 /**
  * Life sprite.
  */
-function randomLifePosition() {
+var lifeSprite;
+var lifeSpriteMaterial;
 
+var lifeDelay = 10;
+// 2 second randomness.
+var lifeProbability = 2 / 60;
+// Ship can grab the life sprite in this radius.
+var lifeRadius = 5;
+// Can spawn the life power-up.
+var lifeSpawnable = false;
+// Whether the ship has picked up the life power-up.
+var lifeAcquired = false;
+
+function lifeProgram( ctx ) {
+  // Outer container.
+  drawDiamond( ctx, 4 );
+  ctx.shadowColor = '#fff';
+  ctx.shadowBlur = 16;
+  ctx.fillStyle = 'rgba(160, 160, 255, 0.5)';
+  ctx.fill();
+
+  // Plus sign.
+  var plusSize = 1.2;
+  ctx.beginPath();
+  // Horizontal line.
+  ctx.moveTo( -plusSize, 0 );
+  ctx.lineTo( plusSize, 0 );
+  // Vertical line.
+  ctx.moveTo( 0, plusSize );
+  ctx.lineTo( 0, -plusSize );
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 0.4;
+  ctx.shadowBlur = 1;
+  ctx.stroke();
+
+  // Inner edge.
+  drawDiamond( ctx, 3 );
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+lifeSpriteMaterial = new SpriteCanvasMaterial({
+  blending: 'lighter'
+});
+
+lifeSpriteMaterial.program = lifeProgram;
+lifeSprite = new Sprite( lifeSpriteMaterial );
+
+function randomLifePosition() {
+  return _vector3.set(
+    _.randFloatSpread( 2 * limit + lifeRadius ),
+    0,
+    _.randFloat( 80, 100 )
+  );
+}
+
+function resetLifeTimer() {
+  animate(noop, lifeDelay, function() {
+    lifeSpawnable = true;
+  });
 }
 
 /**
@@ -749,7 +808,7 @@ function reset() {
   var enemyMesh;
   var enemyGeometry;
   var i, il;
-  for ( i = 0; i < 12; i++ ) {
+  for ( i = 0; i < 16; i++ ) {
     enemyGeometry = createEnemyGeometry();
     enemyMesh = new Mesh( enemyGeometry, createEnemyMaterial() );
     enemyMesh.position.copy( randomEnemyPosition() );
@@ -782,6 +841,15 @@ function reset() {
     sprite.position.copy( randomStarPosition() );
     scene.add( sprite );
   }
+
+  // Life sprite.
+  lifeSprite.position.copy( randomLifePosition() );
+  lifeSprite.visible = false;
+  lifeSprite.scale.set( 1, 1, 1 );
+  scene.add( lifeSprite );
+  animate(noop, lifeDelay, function() {
+    lifeSpawnable = true;
+  });
 
   // Light.
   light.position.set( -4, 2, 0 );
@@ -1079,8 +1147,42 @@ game.onUpdate = function( dt ) {
     sprite.material.opacity = _.clamp( -spriteDepth / 400 + 1, 0, 1 );
   }
 
-  // Add life powerup.
+  // Add life power-up.
+  if ( !lifeSprite.visible && lifeSpawnable && lives < 4 ) {
+    if ( Math.random() < lifeProbability ) {
+      lifeSprite.position.copy( randomLifePosition() );
+      lifeSprite.position.z += position.z;
+      lifeSprite.visible = true;
+      lifeSpawnable = false;
+    }
+  }
 
+  // Update life power-up.
+  var lifePosition;
+  if ( lifeSprite.visible ) {
+    lifePosition = lifeSprite.position;
+    spriteDepth = lifePosition.z - position.z;
+    lifeSprite.material.opacity = _.clamp( -spriteDepth / 80 + 1, 0, 1 );
+
+    // Ship gets life power-up.
+    if ( !lifeAcquired && lifePosition.distanceTo( position ) < lifeRadius ) {
+      lifeAcquired = true;
+      animate(function( t ) {
+        lifePosition.lerp( position, t );
+        lifeSprite.scale.set( 1 - t, 1 - t, 1 - t );
+      }, 0.4, function() {
+        lives++;
+        lifeSprite.visible = false;
+        lifeAcquired = false;
+        lifeSprite.scale.set( 1, 1, 1 );
+        resetLifeTimer();
+      });
+    }
+    // Goodbye power-up.
+    else if ( !lifeAcquired && lifeSprite.position.z < position.z + cameraOffsetZ ) {
+      resetLifeTimer();
+    }
+  }
 
   // Update score.
   score = 10 * position.z;
