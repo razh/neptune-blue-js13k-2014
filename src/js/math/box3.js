@@ -29,6 +29,11 @@ Box3.prototype.expandByPoint = function( point ) {
   return this;
 };
 
+Box3.prototype.expandByScalar = function( scalar ) {
+  this.min.addScalar( -scalar );
+  this.max.addScalar( scalar );
+  return this;
+};
 
 Box3.prototype.makeEmpty = function() {
   this.min.x = this.min.y = this.min.z =  Infinity;

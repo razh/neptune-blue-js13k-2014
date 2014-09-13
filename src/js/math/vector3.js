@@ -31,6 +31,13 @@ Vector3.prototype.subVectors = function( a, b ) {
   return this;
 };
 
+Vector3.prototype.addScalar = function( scalar ) {
+  this.x += scalar;
+  this.y += scalar;
+  this.z += scalar;
+  return this;
+};
+
 Vector3.prototype.multiplyScalar = function( scalar ) {
   this.x *= scalar;
   this.y *= scalar;
