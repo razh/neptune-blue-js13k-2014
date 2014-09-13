@@ -930,6 +930,7 @@ game.onUpdate = function( dt ) {
   camera.position.x = cameraX;
   camera.position.z = position.z + cameraOffsetZ;
   camera.lookAt( new Vector3( cameraX, 3, position.z ) );
+  camera.rotateZ( 0.1 * cameraX );
 
   // Camera shake.
   if ( !alive ) {
