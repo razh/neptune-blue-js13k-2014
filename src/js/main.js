@@ -23,6 +23,9 @@ var HALF_PI = Math.PI / 2;
 
 var $ = document.querySelector.bind( document );
 
+var WIDTH = 852;
+var HEIGHT = 480;
+
 function on( el, type, listener ) {
   el.addEventListener( type, listener );
 }
@@ -121,8 +124,8 @@ var animate = (function() {
 
 
 var game = new Game(
-  Math.min( window.innerWidth, 852 ),
-  Math.min( window.innerHeight, 480 )
+  Math.min( window.innerWidth,  WIDTH  ),
+  Math.min( window.innerHeight, HEIGHT )
 );
 
 var _vector3 = new Vector3();
@@ -809,6 +812,26 @@ var highScoreEl = create();
 highScoreEl.id = 'hs';
 append( container, highScoreEl );
 
+// Resize handling.
+var expanded = false;
+
+function onResize() {
+  game.setSize(
+    Math.min( window.innerWidth,  expanded ? Infinity : WIDTH  ),
+    Math.min( window.innerHeight, expanded ? Infinity : HEIGHT )
+  );
+}
+
+// Left-right arrow.
+var expandButton = createButton( container, 'fs', '[ \u2194 ]', function() {
+  expanded = !expanded;
+  textContent( expandButton, expanded ? '\xD7' : '[ \u2194 ]' );
+  onResize();
+});
+
+on( window, 'resize', onResize );
+
+// Game state controls.
 function play() {
   game.play();
   addClass( menu, 'h' );
@@ -839,6 +862,11 @@ var keys = {};
 
 on( document, 'keydown', function( event ) {
   keys[ event.keyCode ] = true;
+
+  // Space. Prevent button clicks.
+  if ( event.keyCode === 32 ) {
+    event.preventDefault();
+  }
 });
 
 on( document, 'keyup', function( event ) {

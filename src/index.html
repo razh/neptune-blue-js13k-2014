@@ -18,7 +18,7 @@
 
       background: #000;
       color: #fff;
-      font: 1.5em Futura, sans-serif;
+      font: 1.5em Futura, "Helvetica Neue", Helvetica, sans-serif;
     }
 
     /* Center children. */
@@ -57,23 +57,42 @@
       display: none;
     }
 
-    /* Play button. */
-    #p {
+    button {
       background: none;
-      padding: 0.3em 1em;
+      padding: 0;
 
       color: #fff;
-      font: 1.5em Futura, sans-serif;
-      letter-spacing: 0.2em;
+      font: 1.5em Futura, "Helvetica Neue", Helvetica, sans-serif;
 
       outline: 0;
-      border: 0.1em solid;
+      border: 0;
     }
 
-    #p:active {
+    button:active {
       background: #fff;
       color: #000;
       border-color: #fff;
+    }
+
+    /* Play button. */
+    #p {
+      padding: 0.3em 1em;
+      letter-spacing: 0.2em;
+      border: 0.1em solid;
+    }
+
+    /* Expand button. */
+    #fs {
+      position: fixed;
+      z-index: 2;
+
+      right: 0;
+      bottom: 0;
+
+      width: 4em;
+      height: 4em;
+
+      font-size: 0.5em;
     }
 
     /* Score. */
