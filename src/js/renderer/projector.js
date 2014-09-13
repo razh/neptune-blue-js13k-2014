@@ -1,6 +1,7 @@
 'use strict';
 
 var Vector3 = require( '../math/vector3' );
+var Vector4 = require( '../math/vector4' );
 var Matrix3 = require( '../math/matrix3' );
 var Matrix4 = require( '../math/matrix4' );
 var Box3 = require( '../math/Box3' );
@@ -10,20 +11,26 @@ var Quad = require( '../geometry/quad' );
 var DirectionalLight = require( '../lights/directional-light' );
 var Material = require( '../materials/material' );
 
+var Mesh = require( '../objects/mesh' );
+var Sprite = require( '../objects/sprite' );
+
 var RenderableObject = require( './renderable-object' );
 var RenderableVertex = require( './renderable-vertex' );
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
+var RenderableSprite = require( './renderable-sprite' );
 
 function Projector() {
   var _object, _objectCount, _objectPool = [],
   _vertex, _vertexCount = 0, _vertexPool = [],
   _face, _faceCount = 0, _facePool = [],
   _quadCount = 0, _quadPool = [],
+  _sprite, _spriteCount, _spritePool = [],
 
   _renderData = { objects: [], lights: [], elements: [] },
 
   _vector3 = new Vector3(),
+  _vector4 = new Vector4(),
 
   _clipBox = new Box3(
     new Vector3( -1, -1, -1 ),
@@ -109,6 +116,7 @@ function Projector() {
   this.projectScene = function( scene, camera ) {
     _faceCount = 0;
     _quadCount = 0;
+    _spriteCount = 0;
     _objectCount = 0;
 
     camera.updateMatrix();
@@ -168,79 +176,119 @@ function Projector() {
       _modelMatrix = object.matrixWorld;
       _vertexCount = 0;
 
-      vertices = geometry.vertices;
-      faces = geometry.faces;
+      if ( object instanceof Mesh ) {
+        vertices = geometry.vertices;
+        faces = geometry.faces;
 
-      _normalMatrix.getNormalMatrix( _modelMatrix );
-      side = material.side;
+        _normalMatrix.getNormalMatrix( _modelMatrix );
+        side = material.side;
 
-      for ( v = 0, vl = vertices.length; v < vl; v++ ) {
-        vertex = vertices[v];
-        renderList.pushVertex( vertex.x, vertex.y, vertex.z );
-      }
-
-      for ( f = 0, fl = faces.length; f < fl; f++ ) {
-        face = faces[f];
-        isQuad = face instanceof Quad;
-
-        v0 = _vertexPool[ face.a ];
-        v1 = _vertexPool[ face.b ];
-        v2 = _vertexPool[ face.c ];
-
-        if ( isQuad ) {
-          v3 = _vertexPool[ face.d ];
+        for ( v = 0, vl = vertices.length; v < vl; v++ ) {
+          vertex = vertices[v];
+          renderList.pushVertex( vertex.x, vertex.y, vertex.z );
         }
 
-        if ( !isQuad && !renderList.checkTriangleVisibility( v0, v1, v2 ) ||
-              isQuad && !renderList.checkTriangleVisibility( v0, v1, v2, v3 ) ) {
-          continue;
+        for ( f = 0, fl = faces.length; f < fl; f++ ) {
+          face = faces[f];
+          isQuad = face instanceof Quad;
+
+          v0 = _vertexPool[ face.a ];
+          v1 = _vertexPool[ face.b ];
+          v2 = _vertexPool[ face.c ];
+
+          if ( isQuad ) {
+            v3 = _vertexPool[ face.d ];
+          }
+
+          if ( !isQuad && !renderList.checkTriangleVisibility( v0, v1, v2 ) ||
+                isQuad && !renderList.checkTriangleVisibility( v0, v1, v2, v3 ) ) {
+            continue;
+          }
+
+          visible = renderList.checkBackfaceCulling( v0, v1, v2 );
+
+          if ( side !== Material.DoubleSide ) {
+            if ( side === Material.FrontSide && !visible ) continue;
+            if ( side === Material.BackSide && visible ) continue;
+          }
+
+          _face = isQuad ? getNextQuadInPool() : getNextFaceInPool();
+
+          _face.v0.copy( v0 );
+          _face.v1.copy( v1 );
+          _face.v2.copy( v2 );
+          if ( isQuad ) {
+            _face.v3.copy( v3 );
+          }
+
+          _face.normalModel.copy( face.normal );
+
+          if ( !visible &&
+              ( side === Material.BackSide || side === Material.DoubleSide ) ) {
+            _face.normalModel.negate();
+          }
+
+          _face.normalModel.applyMatrix3( _normalMatrix )
+            .normalize();
+
+          _face.color = face.color;
+          _face.material = material;
+
+          if ( isQuad ) {
+            _face.z = (
+              v0.positionScreen.z +
+              v1.positionScreen.z +
+              v2.positionScreen.z +
+              v3.positionScreen.z
+            ) / 4;
+          } else {
+            _face.z = (
+              v0.positionScreen.z +
+              v1.positionScreen.z +
+              v2.positionScreen.z
+            ) / 3;
+          }
+
+          _renderData.elements.push( _face );
         }
+      } else if ( object instanceof Sprite ) {
+        _vector4.set(
+          _modelMatrix.elements[ 12 ],
+          _modelMatrix.elements[ 13 ],
+          _modelMatrix.elements[ 14 ],
+          1
+        ).applyMatrix4( _viewProjectionMatrix );
 
-        visible = renderList.checkBackfaceCulling( v0, v1, v2 );
+        var invW = 1 / _vector4.w;
 
-        if ( side !== Material.DoubleSide ) {
-          if ( side === Material.FrontSide && !visible ) continue;
-          if ( side === Material.BackSide && visible ) continue;
+        _vector4.z *= invW;
+
+        if ( -1 <= _vector4.z && _vector4.z <= 1 ) {
+          _sprite = getNextSpriteInPool();
+          _sprite.x = _vector4.x * invW;
+          _sprite.y = _vector4.y * invW;
+          _sprite.z = _vector4.z;
+          _sprite.object = object;
+
+          _sprite.rotation = object.rotation;
+
+          _sprite.scale.x = object.scale.x *
+            Math.abs(
+              _sprite.x -
+              ( _vector4.x + camera.projectionMatrix.elements[  0 ] ) /
+              ( _vector4.w + camera.projectionMatrix.elements[ 12 ] )
+            );
+          _sprite.scale.y = object.scale.y *
+            Math.abs(
+              _sprite.y -
+              ( _vector4.y + camera.projectionMatrix.elements[  5 ] ) /
+              ( _vector4.w + camera.projectionMatrix.elements[ 13 ] )
+            );
+
+          _sprite.material = object.material;
+
+          _renderData.elements.push( _sprite );
         }
-
-        _face = isQuad ? getNextQuadInPool() : getNextFaceInPool();
-
-        _face.v0.copy( v0 );
-        _face.v1.copy( v1 );
-        _face.v2.copy( v2 );
-        if ( isQuad ) {
-          _face.v3.copy( v3 );
-        }
-
-        _face.normalModel.copy( face.normal );
-
-        if ( !visible &&
-            ( side === Material.BackSide || side === Material.DoubleSide ) ) {
-          _face.normalModel.negate();
-        }
-
-        _face.normalModel.applyMatrix3( _normalMatrix )
-          .normalize();
-
-        _face.color = face.color;
-        _face.material = material;
-
-        if ( isQuad ) {
-          _face.z = (
-            v0.positionScreen.z +
-            v1.positionScreen.z +
-            v2.positionScreen.z +
-            v3.positionScreen.z
-          ) / 4;
-        } else {
-          _face.z = (
-            v0.positionScreen.z +
-            v1.positionScreen.z +
-            v2.positionScreen.z
-          ) / 3;
-        }
-
-        _renderData.elements.push( _face );
       }
     }
 
@@ -291,6 +339,17 @@ function Projector() {
     }
 
     return _quadPool[ _quadCount++ ];
+  }
+
+  function getNextSpriteInPool() {
+    if ( _spriteCount === _spritePool.length ) {
+      var sprite = new RenderableSprite();
+      _spritePool.push( sprite );
+      _spriteCount++;
+      return sprite;
+    }
+
+    return _spritePool[ _spriteCount++ ];
   }
 
   function painterSort( a, b ) {

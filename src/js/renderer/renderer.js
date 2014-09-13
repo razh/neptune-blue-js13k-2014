@@ -6,6 +6,7 @@ var Utils = require( '../utils' );
 
 var RenderableFace = require( './renderable-face' );
 var RenderableQuad = require( './renderable-quad' );
+var RenderableSprite = require( './renderable-sprite' );
 
 var Projector = require( './projector' );
 
@@ -98,7 +99,13 @@ function Renderer( options ) {
         continue;
       }
 
-      if ( element instanceof RenderableFace ) {
+      if ( element instanceof RenderableSprite ) {
+        element.x *= _canvasWidthHalf;
+        element.y *= _canvasHeightHalf;
+
+        renderSprite( element, material );
+
+      } else if ( element instanceof RenderableFace ) {
         isQuad = element instanceof RenderableQuad;
 
         _v0 = element.v0;
@@ -173,6 +180,26 @@ function Renderer( options ) {
     }
 
     return intensity;
+  }
+
+  function renderSprite( element, material ) {
+    material.set( _ctx );
+    _ctx.beginPath();
+
+    var scaleX = element.scale.x * _canvasWidthHalf;
+    var scaleY = element.scale.y * _canvasHeightHalf;
+
+    _ctx.save();
+
+    _ctx.translate( element.x, element.y );
+    if ( material.rotation ) {
+      _ctx.rotate( material.rotation );
+    }
+    _ctx.scale( scaleX, scaleY );
+
+    material.draw( _ctx );
+
+    _ctx.restore();
   }
 
   function renderFace( element, material, isQuad, v0, v1, v2, v3 ) {
