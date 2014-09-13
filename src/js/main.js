@@ -19,6 +19,8 @@ var createIcosahedronGeometry = require( './geometry/icosahedron-geometry' );
 
 var _ = require( './utils' );
 
+var noop = function() {};
+
 var DEG_TO_RAD = Math.PI / 180;
 var HALF_PI = Math.PI / 2;
 
@@ -84,37 +86,47 @@ var animate = (function() {
     var removedIndices = [];
 
     /**
-     * Animations are stored as a 3-element array:
+     * Animations are stored as a 4-element array:
      *
-     *   [ fn, duration, time ]
+     *   [ fn, duration, time, done ]
      *
      * Where:
      *   fn - animation callback function. Receives time as a parameter.
      *   duration - animation duration.
      *   time - elapsed time.
+     *   done - done callback.
      */
     var animation;
-    var duration, time;
-    for ( var i = 0, il = animations.length; i < il; i++ ) {
+    var doneCallbacks = [];
+    var fn, duration, time, done;
+    var i, il;
+    for ( i = 0, il = animations.length; i < il; i++ ) {
       animation = animations[i];
 
+      fn = animation[0];
       duration = animation[1];
       time = animation[2] += dt;
+
       if ( time >= duration ) {
         removedIndices.push( i );
+
+        done = animation[3];
+        if ( done ) {
+          doneCallbacks.push( done );
+        }
       }
 
       animation[0]( _.clamp( time / duration, 0, 1 ) );
     }
 
     removeIndices( animations, removedIndices );
+    for ( i = 0, il = doneCallbacks.length; i < il; i++ ) {
+      doneCallbacks[i]();
+    }
   }
 
-  function animate( fn, duration ) {
-    if ( fn ) {
-      animations.push( [ fn, duration || 0, 0 ] );
-    }
-
+  function animate( fn, duration, done ) {
+    animations.push( [ fn, duration || 0, 0, done ] );
     return animate;
   }
 
@@ -679,6 +691,13 @@ function randomStarPosition() {
 }
 
 /**
+ * Life sprite.
+ */
+function randomLifePosition() {
+
+}
+
+/**
  * Lights, camera, action.
  */
 game.ambient.setRGB( 0.3, 0.3, 0.5 );
@@ -704,8 +723,17 @@ var planeOffset;
 var score;
 var highScore = 0;
 
+var lives;
+var isHit;
+
+function resetHit() {
+  isHit = false;
+}
+
 function reset() {
   alive = true;
+  lives = 3;
+  isHit = false;
 
   score = 0;
   time = 0;
@@ -790,6 +818,10 @@ var highScoreEl = create();
 highScoreEl.id = 'hs';
 append( container, highScoreEl );
 
+var livesEl = create();
+livesEl.id = 'l';
+append( container, livesEl );
+
 // Resize handling.
 var expanded = false;
 
@@ -831,7 +863,7 @@ on( window, 'blur', pause );
 function end() {
   game.pause();
   reset();
-  textContent( playButton, 'Again?' );
+  textContent( playButton, 'RETRY' );
   removeClass( menu, 'h' );
 }
 
@@ -911,7 +943,7 @@ game.onUpdate = function( dt ) {
   camera.rotateZ( 0.1 * cameraX );
 
   // Camera shake.
-  if ( !alive ) {
+  if ( isHit || !alive ) {
     camera.position.x = cameraX + _.randFloatSpread(0.5);
     camera.position.y = cameraY + _.randFloatSpread(0.5);
   }
@@ -955,9 +987,18 @@ game.onUpdate = function( dt ) {
           .multiplyScalar( 0.5 )
       );
 
-      alive = false;
-      playExplosionSound();
-      setTimeout( end, 1024 );
+      if ( !isHit ) {
+        isHit = true;
+        playExplosionSound();
+        // 0.6 is roughly around how long the explosion sound lasts.
+        animate(noop, 0.6, resetHit );
+
+        lives--;
+        if ( lives <= 0 ) {
+          alive = false;
+          setTimeout( end, 1024 );
+        }
+      }
       break;
     } else {
       enemyMesh.material.color.copy( enemyColor );
@@ -1038,6 +1079,9 @@ game.onUpdate = function( dt ) {
     sprite.material.opacity = _.clamp( -spriteDepth / 400 + 1, 0, 1 );
   }
 
+  // Add life powerup.
+
+
   // Update score.
   score = 10 * position.z;
   if ( score > highScore ) {
@@ -1046,4 +1090,5 @@ game.onUpdate = function( dt ) {
 
   textContent( highScoreEl, 'HIGH SCORE: ' + ( highScore | 0 ) );
   textContent( scoreEl, 'SCORE: ' + ( score | 0 ) );
+  textContent( livesEl, 'LIVES: ' + ( lives | 0 ) );
 };
