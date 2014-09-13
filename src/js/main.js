@@ -720,11 +720,14 @@ game.onUpdate = function( dt ) {
   }
 
   position.z += vz * dt;
+  var cameraX = 0.1 * position.x;
+  camera.position.x = cameraX;
   camera.position.z = position.z + cameraOffsetZ;
+  camera.lookAt( new Vector3( cameraX, 3, position.z ) );
 
   shipMesh.updateQuaternion();
   shipMesh.updateMatrix();
-  boundingBox.setFromObject( shipMesh );
+  boundingBox.setFromObject( shipMesh ).expandByScalar( -0.2 );
 
   var boxMesh;
   var boxPosition;
