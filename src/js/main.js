@@ -709,7 +709,7 @@ var lifeRadius = 5;
 // Can spawn the life power-up.
 var lifeSpawnable = false;
 // Whether the ship has picked up the life power-up.
-var lifeAcquired = false;
+var lifeAcquired;
 
 function lifeProgram( ctx ) {
   // Outer container.
@@ -814,7 +814,7 @@ function reset() {
   var enemyMesh;
   var enemyGeometry;
   var i, il;
-  for ( i = 0; i < 16; i++ ) {
+  for ( i = 0; i < 12; i++ ) {
     enemyGeometry = createEnemyGeometry();
     enemyMesh = new Mesh( enemyGeometry, createEnemyMaterial() );
     enemyMesh.position.copy( randomEnemyPosition() );
@@ -849,6 +849,7 @@ function reset() {
   }
 
   // Life sprite.
+  lifeAcquired = false;
   lifeSprite.position.copy( randomLifePosition() );
   lifeSprite.visible = false;
   lifeSprite.scale.set( 1, 1, 1 );
