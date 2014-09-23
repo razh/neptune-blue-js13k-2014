@@ -1,6 +1,8 @@
 Neptune Blue | js13k 2014
 =====
 
+#### Play the original [js13k submission](http://js13kgames.com/entries/neptune-blue).
+
 ##### Space ship.
 ##### Space ocean.
 ##### Space rocks.
@@ -36,7 +38,7 @@ To build for production:
 
 ### Notes
 
-This is built with a stripped-down and heavily modified version of [three.js](https://github.com/mrdoob/three.js).
+This is built with a stripped-down and heavily-modified version of the [three.js](https://github.com/mrdoob/three.js) CanvasRenderer.
 
 ### Thanks to
 - [end3r](https://github.com/end3r) for js13k.
